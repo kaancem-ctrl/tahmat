@@ -14,7 +14,6 @@
          .btn-active-green { background-color: #22c55e !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
          .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); }
          .hide { display: none; }
-         /* Dikkat çekici yanıp sönme efekti */
          @keyframes pulse-border {
             0%, 100% { border-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
             50% { border-color: #ef4444; box-shadow: 0 0 15px #ef4444; }
@@ -22,6 +21,12 @@
          .warning-banner {
             animation: pulse-border 2s infinite;
             background: rgba(245, 158, 11, 0.1);
+         }
+         .shake { animation: shake 0.4s ease-in-out; }
+         @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
          }
      </style>
 </head>
@@ -52,19 +57,7 @@
      <main id="mainScreen" class="w-full max-w-md space-y-6">
          <div class="text-center space-y-2">
              <span class="bg-indigo-900/50 text-indigo-400 text-[10px] px-3 py-1 rounded-full font-bold">TEKNOFEST 2026</span>
-             <p class="text-slate-300">Ailenizle birlikte matematik zekanızı test edin!</p>
-         </div>
-
-         <div class="card-dark p-6">
-             <h3 class="text-sm font-bold text-slate-400 mb-4 text-center uppercase tracking-widest">Oyuncu Sayısı</h3>
-             <div class="grid grid-cols-6 gap-2">
-                 <button onclick="setPlayers(1)" id="p1" class="btn-opt py-3 rounded-xl font-bold btn-active-blue">1</button>
-                 <button onclick="setPlayers(2)" id="p2" class="btn-opt py-3 rounded-xl font-bold">2</button>
-                 <button onclick="setPlayers(3)" id="p3" class="btn-opt py-3 rounded-xl font-bold">3</button>
-                 <button onclick="setPlayers(4)" id="p4" class="btn-opt py-3 rounded-xl font-bold">4</button>
-                 <button onclick="setPlayers(5)" id="p5" class="btn-opt py-3 rounded-xl font-bold">5</button>
-                 <button onclick="setPlayers(6)" id="p6" class="btn-opt py-3 rounded-xl font-bold">6</button>
-             </div>
+             <p class="text-slate-300">Rakamları birbirinden farklı sayıyı bul!</p>
          </div>
 
          <div class="card-dark p-6">
@@ -79,46 +72,35 @@
          <button onclick="startGame()" class="btn-gradient w-full py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition-transform uppercase">Oyuna Başla</button>
 
          <div class="card-dark p-5 space-y-4">
-             <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest text-center">Oyun Kuralları</h3>
-             <div class="grid grid-cols-2 gap-3">
-                 <div class="bg-green-900/20 border border-green-800 p-3 rounded-xl">
-                     <div class="flex items-center gap-2 mb-1">
-                         <span class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center font-bold text-sm">+</span>
-                         <span class="font-bold text-green-400">Doğru Yer</span>
-                     </div>
-                     <p class="text-[10px] text-green-500/80">Rakam var ve yeri doğru</p>
-                 </div>
-                 <div class="bg-red-900/20 border border-red-800 p-3 rounded-xl">
-                     <div class="flex items-center gap-2 mb-1">
-                         <span class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center font-bold text-sm">-</span>
-                         <span class="font-bold text-red-400">Yanlış Yer</span>
-                     </div>
-                     <p class="text-[10px] text-red-500/80">Rakam var ama yeri yanlış</p>
-                 </div>
-             </div>
+             <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest text-center">Önemli Kurallar</h3>
+             <ul class="text-xs space-y-2 text-slate-300">
+                <li class="flex items-start gap-2">✨ <span class="text-indigo-400 font-bold">Rakamlar Farklı:</span> Her rakamı sadece 1 kez kullanabilirsin.</li>
+                <li class="flex items-start gap-2">💡 <span class="text-amber-400 font-bold">İpucu:</span> Zorlandığında bir rakamın yerini öğrenebilirsin.</li>
+             </ul>
          </div>
      </main>
-
-     <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 mt-10">
-         <h2 class="text-2xl font-bold text-center mb-6 text-indigo-400">🏆 Liderlik Tablosu</h2>
-         <div id="leaderList" class="space-y-3 mb-6"></div>
-         <button onclick="closeLeaderboard()" class="w-full py-3 bg-slate-700 rounded-xl font-bold">Geri Dön</button>
-     </div>
 
      <div id="gameScreen" class="hide w-full max-w-md space-y-4 mt-6">
          <div class="card-dark p-4 flex justify-between items-center">
              <div id="gameInfo" class="text-sm font-bold text-indigo-400"></div>
-             <button onclick="location.reload()" class="text-xs text-slate-500 underline">Menüye Dön</button>
+             <div class="flex gap-2">
+                <button onclick="getHint()" id="hintBtn" class="bg-amber-600/20 text-amber-500 border border-amber-500/30 px-3 py-1 rounded-lg text-xs font-bold hover:bg-amber-600/40 transition">İPUCU (1)</button>
+                <button onclick="location.reload()" class="text-xs text-slate-500 underline">Menü</button>
+             </div>
          </div>
+         
+         <div id="hintBox" class="hide card-dark p-3 bg-amber-500/10 border-amber-500/30 text-amber-200 text-center text-xs font-bold rounded-xl animate-bounce"></div>
+
          <div class="card-dark p-6 text-center">
-             <input type="text" id="guessInput" class="w-full bg-transparent text-5xl text-center font-bold tracking-[0.5em] outline-none border-b-2 border-indigo-500 pb-2 mb-6" maxlength="4">
+             <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-5xl text-center font-bold tracking-[0.5em] outline-none border-b-2 border-indigo-500 pb-2 mb-6" placeholder="...." maxlength="4">
+             <p id="errorText" class="text-red-500 text-[10px] mb-2 font-bold opacity-0 transition">RAKAMLAR FARKLI OLMALI!</p>
              <button onclick="makeGuess()" class="btn-gradient w-full py-4 rounded-xl font-bold">TAHMİN ET</button>
          </div>
-         <div id="history" class="space-y-2 overflow-y-auto max-h-64"></div>
+         <div id="history" class="space-y-2 overflow-y-auto max-h-64 pr-1"></div>
      </div>
 
      <script>
-         let config = { players: 1, digits: 4, sound: true, target: '', attempts: 0, startTime: 0 };
+         let config = { digits: 4, sound: true, target: '', attempts: 0, hintUsed: false };
          let audio = new (window.AudioContext || window.webkitAudioContext)();
 
          function play(f, d) {
@@ -129,13 +111,6 @@
              o.frequency.value = f;
              g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d);
              o.start(); o.stop(audio.currentTime + d);
-         }
-
-         function setPlayers(n) {
-             config.players = n;
-             document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue'));
-             document.getElementById('p'+n).classList.add('btn-active-blue');
-             play(440, 0.1);
          }
 
          function setDigits(n) {
@@ -151,23 +126,67 @@
              document.getElementById('soundBtn').innerText = config.sound ? 'S' : 'X';
          }
 
+         function validateInput(input) {
+             input.value = input.value.replace(/[^0-9]/g, '');
+             let unique = new Set(input.value);
+             if(unique.size !== input.value.length) {
+                 document.getElementById('errorText').style.opacity = "1";
+                 input.classList.add('text-red-500');
+             } else {
+                 document.getElementById('errorText').style.opacity = "0";
+                 input.classList.remove('text-red-500');
+             }
+         }
+
          function startGame() {
-             let n = [1,2,3,4,5,6,7,8,9];
+             let n = [0,1,2,3,4,5,6,7,8,9];
              n.sort(() => Math.random() - 0.5);
+             if (n[0] === 0) n.push(n.shift()); // İlk rakam 0 olmasın (opsiyonel)
              config.target = n.slice(0, config.digits).join('');
              config.attempts = 0;
-             config.startTime = Date.now();
+             config.hintUsed = false;
+             
              document.getElementById('mainScreen').classList.add('hide');
              document.getElementById('gameScreen').classList.remove('hide');
-             document.getElementById('gameInfo').innerText = config.digits + " Basamaklı Sayı Bulun";
+             document.getElementById('gameInfo').innerText = config.digits + " Basamaklı Hedef";
+             document.getElementById('hintBtn').disabled = false;
+             document.getElementById('hintBtn').innerText = "İPUCU (1)";
+             document.getElementById('hintBox').classList.add('hide');
+             document.getElementById('guessInput').value = '';
+             document.getElementById('history').innerHTML = '';
              play(659, 0.3);
+         }
+
+         function getHint() {
+            if(config.hintUsed) return;
+            let index = Math.floor(Math.random() * config.digits);
+            let digit = config.target[index];
+            let hintBox = document.getElementById('hintBox');
+            hintBox.innerText = `İPUCU: ${index + 1}. basamak "${digit}" rakamıdır.`;
+            hintBox.classList.remove('hide');
+            config.hintUsed = true;
+            document.getElementById('hintBtn').disabled = true;
+            document.getElementById('hintBtn').innerText = "KULLANILDI";
+            play(440, 0.2);
          }
 
          function makeGuess() {
              let input = document.getElementById('guessInput');
              let val = input.value;
+             let errorText = document.getElementById('errorText');
+             
+             // Basamak kontrolü
              if(val.length != config.digits) return;
              
+             // Rakamlar aynı mı kontrolü
+             let unique = new Set(val);
+             if(unique.size !== val.length) {
+                play(150, 0.3);
+                input.parentElement.classList.add('shake');
+                setTimeout(() => input.parentElement.classList.remove('shake'), 400);
+                return;
+             }
+
              config.attempts++;
              let p=0, m=0;
              let tArr = config.target.split('');
@@ -179,7 +198,7 @@
              });
 
              let row = document.createElement('div');
-             row.className = 'card-dark p-4 flex justify-between items-center';
+             row.className = 'card-dark p-4 flex justify-between items-center border-l-4 ' + (p > 0 ? 'border-green-500' : 'border-slate-600');
              row.innerHTML = `<span class="text-xl font-bold tracking-widest">${val}</span>
                               <div class="flex gap-4 font-bold">
                                   <span class="text-green-500">+${p}</span>
@@ -191,37 +210,12 @@
              if(val === config.target) {
                  play(880, 0.5);
                  setTimeout(() => {
-                     let name = prompt("Tebrikler! İsminizi yazın:");
-                     saveRecord(name, config.attempts);
+                     alert(`TEBRİKLER! 🎉\n${config.attempts} hamlede buldun!`);
                      location.reload();
                  }, 500);
              } else {
                  play(330, 0.1);
              }
-         }
-
-         function saveRecord(name, score) {
-             let records = JSON.parse(localStorage.getItem('tahmat_rekor')) || [];
-             records.push({name: name || 'Anonim', score: score});
-             records.sort((a,b) => a.score - b.score);
-             localStorage.setItem('tahmat_rekor', JSON.stringify(records.slice(0, 5)));
-         }
-
-         function showLeaderboard() {
-             document.getElementById('mainScreen').classList.add('hide');
-             document.getElementById('leaderboardScreen').classList.remove('hide');
-             let records = JSON.parse(localStorage.getItem('tahmat_rekor')) || [];
-             document.getElementById('leaderList').innerHTML = records.map((r, i) => `
-                 <div class="flex justify-between p-3 bg-slate-800 rounded-lg">
-                     <span>${i+1}. ${r.name}</span>
-                     <span class="text-indigo-400 font-bold">${r.score} Hamle</span>
-                 </div>
-             `).join('') || '<p class="text-center text-slate-500">Henüz rekor yok</p>';
-         }
-
-         function closeLeaderboard() {
-             document.getElementById('leaderboardScreen').classList.add('hide');
-             document.getElementById('mainScreen').classList.remove('hide');
          }
      </script>
 </body>
