@@ -6,6 +6,10 @@
      <title>TahMat</title>
      <script src="https://cdn.tailwindcss.com"></script>
      <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+     
+     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
      <style>
          body { font-family: 'Fredoka', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
          .card-dark { background-color: #1e293b; border: 1px solid #334155; border-radius: 1.5rem; }
@@ -38,7 +42,7 @@
              <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl">T</div>
              <div>
                  <h1 class="text-xl font-bold tracking-tight">TAHMAT</h1>
-                 <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Aile Modu</p>
+                 <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Dünya Rekorları Aktif</p>
              </div>
          </div>
          <div class="flex gap-2">
@@ -48,7 +52,7 @@
      </header>
 
      <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4">
-        <h2 class="text-xl font-black text-center text-indigo-400 uppercase">🏆 REKORLAR</h2>
+        <h2 class="text-xl font-black text-center text-indigo-400 uppercase">🏆 DÜNYA REKORLARI</h2>
         <div id="leaderList" class="space-y-2"></div>
         <button onclick="closeLeaderboard()" class="w-full py-3 bg-slate-700 rounded-xl font-bold uppercase text-xs">Kapat</button>
      </div>
@@ -79,11 +83,11 @@
              <div class="grid grid-cols-2 gap-3">
                  <div class="card-dark p-3 border-t-4 border-green-500 text-center">
                      <span class="text-xl font-bold text-green-500">+ (Artı)</span>
-                     <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Doğru Yer</p>
+                     <p class="text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Doğru Yer</p>
                  </div>
                  <div class="card-dark p-3 border-t-4 border-red-500 text-center">
                      <span class="text-xl font-bold text-red-500">- (Eksi)</span>
-                     <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Yanlış Yer</p>
+                     <p class="text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Yanlış Yer</p>
                  </div>
              </div>
          </div>
@@ -113,6 +117,21 @@
      </div>
 
      <script>
+         // --- 🔑 BURAYI KENDİ FIREBASE BİLGİLERİNLE DOLDUR ---
+         const firebaseConfig = {
+            apiKey: "AIza...", 
+            authDomain: "tahmat-ac714.firebaseapp.com",
+            databaseURL: "https://tahmat-ac714-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "tahmat-ac714",
+            storageBucket: "tahmat-ac714.appspot.com",
+            messagingSenderId: "SAYILAR",
+            appId: "APP_ID"
+         };
+
+         // Firebase Başlat
+         firebase.initializeApp(firebaseConfig);
+         const db = firebase.database();
+
          let config = { 
             totalPlayers: 1, 
             currentPlayer: 1, 
@@ -139,9 +158,7 @@
 
          function setPlayers(n) {
              config.totalPlayers = parseInt(n);
-             // Tüm butonlardan aktif sınıfını kaldır
              document.querySelectorAll('[id^="p"]').forEach(btn => btn.classList.remove('btn-active-blue'));
-             // Seçilen butona ekle
              document.getElementById('p' + n).classList.add('btn-active-blue');
              play(440, 0.1);
          }
@@ -169,13 +186,22 @@
             document.getElementById('mainScreen').classList.add('hide');
             document.getElementById('infoBanner').classList.add('hide');
             document.getElementById('leaderboardScreen').classList.remove('hide');
-            const records = JSON.parse(localStorage.getItem('tahmat_rekor')) || [];
-            document.getElementById('leaderList').innerHTML = records.map((r, i) => `
-                <div class="flex justify-between p-3 bg-slate-800 rounded-xl border border-slate-700">
-                    <span class="font-bold">${i+1}. ${r.name}</span>
-                    <span class="text-indigo-400 font-black">${r.score} Hamle</span>
-                </div>
-            `).join('') || '<p class="text-center text-slate-500 py-4 text-xs">Henüz rekor yok!</p>';
+            
+            const list = document.getElementById('leaderList');
+            list.innerHTML = '<p class="text-center animate-pulse">Yükleniyor...</p>';
+
+            db.ref('rekorlar').orderByChild('score').limitToFirst(10).once('value', snapshot => {
+                list.innerHTML = '';
+                snapshot.forEach(child => {
+                    const r = child.val();
+                    list.innerHTML += `
+                        <div class="flex justify-between p-3 bg-slate-800 rounded-xl border border-slate-700 animate-in fade-in">
+                            <span class="font-bold">${r.name}</span>
+                            <span class="text-indigo-400 font-black">${r.score} Hamle</span>
+                        </div>`;
+                });
+                if(list.innerHTML === '') list.innerHTML = '<p class="text-center text-slate-500 py-4 text-xs">Henüz dünya rekoru yok!</p>';
+            });
          }
 
          function closeLeaderboard() {
@@ -245,12 +271,9 @@
              if(val === config.target) {
                  play(880, 0.5);
                  setTimeout(() => {
-                     const name = prompt(`${config.currentPlayer}. OYUNCU KAZANDI! 🎉\nRekorlar için isminizi girin:`);
+                     const name = prompt(`${config.currentPlayer}. OYUNCU KAZANDI! 🎉\nİsminizi girin:`);
                      if(name) {
-                        let records = JSON.parse(localStorage.getItem('tahmat_rekor')) || [];
-                        records.push({name: name, score: config.attempts});
-                        records.sort((a,b) => a.score - b.score);
-                        localStorage.setItem('tahmat_rekor', JSON.stringify(records.slice(0, 5)));
+                        db.ref('rekorlar').push({name: name, score: config.attempts});
                      }
                      location.reload();
                  }, 300);
