@@ -9,15 +9,15 @@
      <style>
          body { font-family: 'Fredoka', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
          .card-dark { background-color: #1e293b; border: 1px solid #334155; border-radius: 1.5rem; }
-         .btn-opt { background-color: #334155; transition: 0.2s; cursor: pointer; border: none; }
-         .btn-active-blue { background-color: #6366f1 !important; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
-         .btn-active-green { background-color: #22c55e !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+         .btn-opt { background-color: #334155; transition: 0.2s; cursor: pointer; border: none; outline: none; }
+         .btn-active-blue { background-color: #6366f1 !important; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); transform: scale(1.05); }
+         .btn-active-green { background-color: #22c55e !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); transform: scale(1.05); }
          .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); cursor: pointer; }
          .hide { display: none !important; }
          
          @keyframes notice-pulse {
-            0%, 100% { border-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; transform: scale(1); }
-            50% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); transform: scale(1.01); }
+            0%, 100% { border-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+            50% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
          }
          .warning-banner { animation: notice-pulse 2s infinite ease-in-out; border-width: 2px; }
          .shake { animation: shake 0.4s ease-in-out; }
@@ -76,21 +76,14 @@
          <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl active:scale-95 transition-all uppercase">Oyunu Başlat</button>
 
          <div class="space-y-3">
-             <div class="card-dark p-4 border-l-4 border-amber-500 bg-amber-500/5">
-                 <h4 class="text-amber-500 font-bold text-sm mb-1 italic">💡 İPUCU NASIL ÇALIŞIR?</h4>
-                 <p class="text-[11px] text-slate-300 leading-relaxed">
-                     Sıra sana geldiğinde tıkanırsan, sistem sana gizli sayıdaki rakamlardan birini ve yerini rastgele fısıldar. Ama unutma, her ipucu fazladan hamle sayılır!
-                 </p>
-             </div>
-
              <div class="grid grid-cols-2 gap-3">
                  <div class="card-dark p-3 border-t-4 border-green-500 text-center">
                      <span class="text-xl font-bold text-green-500">+ (Artı)</span>
-                     <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">Doğru Rakam<br>Doğru Yer</p>
+                     <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Doğru Yer</p>
                  </div>
                  <div class="card-dark p-3 border-t-4 border-red-500 text-center">
                      <span class="text-xl font-bold text-red-500">- (Eksi)</span>
-                     <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">Doğru Rakam<br>Yanlış Yer</p>
+                     <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Yanlış Yer</p>
                  </div>
              </div>
          </div>
@@ -134,25 +127,29 @@
 
          function play(f, d) {
              if(!config.sound) return;
-             const o = audio.createOscillator();
-             const g = audio.createGain();
-             o.connect(g); g.connect(audio.destination);
-             o.frequency.value = f;
-             g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d);
-             o.start(); o.stop(audio.currentTime + d);
+             try {
+                const o = audio.createOscillator();
+                const g = audio.createGain();
+                o.connect(g); g.connect(audio.destination);
+                o.frequency.value = f;
+                g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d);
+                o.start(); o.stop(audio.currentTime + d);
+             } catch(e) {}
          }
 
          function setPlayers(n) {
-             config.totalPlayers = n;
-             for(let i=1; i<=4; i++) document.getElementById('p'+i).classList.remove('btn-active-blue');
-             document.getElementById('p'+n).classList.add('btn-active-blue');
+             config.totalPlayers = parseInt(n);
+             // Tüm butonlardan aktif sınıfını kaldır
+             document.querySelectorAll('[id^="p"]').forEach(btn => btn.classList.remove('btn-active-blue'));
+             // Seçilen butona ekle
+             document.getElementById('p' + n).classList.add('btn-active-blue');
              play(440, 0.1);
          }
 
          function setDigits(n) {
-             config.digits = n;
-             for(let i=3; i<=5; i++) document.getElementById('d'+i).classList.remove('btn-active-green');
-             document.getElementById('d'+n).classList.add('btn-active-green');
+             config.digits = parseInt(n);
+             document.querySelectorAll('[id^="d"]').forEach(btn => btn.classList.remove('btn-active-green'));
+             document.getElementById('d' + n).classList.add('btn-active-green');
              document.getElementById('guessInput').maxLength = n;
              play(554, 0.1);
          }
@@ -215,8 +212,8 @@
 
          function getHint() {
             const randIdx = Math.floor(Math.random() * config.digits);
-            alert(`Sır: ${randIdx + 1}. basamakta "${config.target[randIdx]}" rakamı var.`);
-            config.attempts += 2; // İpucu cezası
+            alert(`İpucu: ${randIdx + 1}. basamakta "${config.target[randIdx]}" rakamı var.`);
+            config.attempts += 2;
          }
 
          function makeGuess() {
@@ -248,7 +245,7 @@
              if(val === config.target) {
                  play(880, 0.5);
                  setTimeout(() => {
-                     const name = prompt(`${config.currentPlayer}. OYUNCU KAZANDI! 🎉\nİsminizi liderlik tablosuna kaydedin:`);
+                     const name = prompt(`${config.currentPlayer}. OYUNCU KAZANDI! 🎉\nRekorlar için isminizi girin:`);
                      if(name) {
                         let records = JSON.parse(localStorage.getItem('tahmat_rekor')) || [];
                         records.push({name: name, score: config.attempts});
