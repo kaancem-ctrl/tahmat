@@ -9,38 +9,26 @@
      
      <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
      <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
      <style>
-         /* Tema Değişkenleri */
-         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #ffffff;
-            --border-color: #334155;
-         }
+         :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #ffffff; --border-color: #334155; }
+         .light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --border-color: #e2e8f0; }
 
-         .light-theme {
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --border-color: #e2e8f0;
-         }
-
-         body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; transition: background 0.3s, color 0.3s; }
-         .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: background 0.3s, border 0.3s; }
-         .btn-opt { background-color: #334155; color: white; transition: 0.2s; cursor: pointer; border: none; outline: none; }
-         .btn-active-blue { background-color: #6366f1 !important; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); transform: scale(1.05); }
-         .btn-active-green { background-color: #22c55e !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); transform: scale(1.05); }
+         body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; transition: 0.3s; }
+         .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; }
+         .btn-opt { background-color: #334155; color: white; transition: 0.2s; cursor: pointer; border: none; }
+         .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+         .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
          .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); color: white; cursor: pointer; }
          .hide { display: none !important; }
          
-         @keyframes notice-pulse {
-            0%, 100% { border-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
-            50% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
-         }
+         @keyframes notice-pulse { 0%, 100% { border-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; } 50% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); } }
          .warning-banner { animation: notice-pulse 2s infinite ease-in-out; border-width: 2px; }
          .shake { animation: shake 0.4s ease-in-out; }
          @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+         
+         .badge { font-size: 10px; padding: 2px 6px; border-radius: 6px; font-weight: bold; margin-left: 4px; display: inline-block; }
      </style>
 </head>
 <body class="p-4 flex flex-col items-center">
@@ -56,20 +44,33 @@
          <div class="flex items-center gap-3">
              <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl text-white">T</div>
              <div>
-                 <h1 class="text-xl font-bold tracking-tight">TAHMAT</h1>
-                 <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Renk Modu Aktif</p>
+                 <h1 class="text-xl font-bold tracking-tight uppercase">TAHMAT</h1>
+                 <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Başarımlar Aktif</p>
              </div>
          </div>
          <div class="flex gap-2">
-             <button onclick="toggleTheme()" id="themeBtn" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">☀️</button>
-             <button onclick="showLeaderboard()" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">🏆</button>
-             <button onclick="toggleSound()" id="soundBtn" class="w-10 h-10 card-dark flex items-center justify-center text-xs hover:bg-slate-700 transition font-bold">S</button>
+             <button onclick="toggleTheme()" id="themeBtn" title="Tema" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">☀️</button>
+             <button onclick="showAwards()" title="Başarımlar" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">🏅</button>
+             <button onclick="showLeaderboard()" title="Rekorlar" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">🏆</button>
          </div>
      </header>
 
+     <div id="awardsScreen" class="hide w-full max-w-md card-dark p-6 space-y-4">
+        <h2 class="text-xl font-black text-center text-amber-500 uppercase italic">🏅 KAZANILABİLİR MADALYALAR</h2>
+        <div class="grid grid-cols-1 gap-2 text-sm">
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700">🚀 <b>Işık Hızı:</b> 5 hamle veya altında bitir.</div>
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700">🧠 <b>Zihin Ustası:</b> 5 basamaklı modu bitir.</div>
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700">🌙 <b>Gece Kuşu:</b> Gece 22:00 - 06:00 arası kazan.</div>
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700">🎯 <b>Tam İsabet:</b> Hiç (-) almadan oyunu bitir.</div>
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700">🐢 <b>Sabırlı:</b> 20 hamleden fazla sürede bil.</div>
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700">🔥 <b>Seri Tahminci:</b> 60 saniyeden kısa sürede bitir.</div>
+        </div>
+        <button onclick="closeAwards()" class="w-full py-3 bg-slate-700 text-white rounded-xl font-bold uppercase text-xs">Geri Dön</button>
+     </div>
+
      <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4">
         <h2 class="text-xl font-black text-center text-indigo-400 uppercase">🏆 DÜNYA REKORLARI</h2>
-        <div id="leaderList" class="space-y-2"></div>
+        <div id="leaderList" class="space-y-2 overflow-y-auto max-h-[400px]"></div>
         <button onclick="closeLeaderboard()" class="w-full py-3 bg-slate-700 text-white rounded-xl font-bold uppercase text-xs">Kapat</button>
      </div>
 
@@ -93,24 +94,11 @@
              </div>
          </div>
 
-         <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl active:scale-95 transition-all uppercase">Oyunu Başlat</button>
-
-         <div class="space-y-3">
-             <div class="grid grid-cols-2 gap-3">
-                 <div class="card-dark p-3 border-t-4 border-green-500 text-center">
-                     <span class="text-xl font-bold text-green-500">+ (Artı)</span>
-                     <p class="text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Doğru Yer</p>
-                 </div>
-                 <div class="card-dark p-3 border-t-4 border-red-500 text-center">
-                     <span class="text-xl font-bold text-red-500">- (Eksi)</span>
-                     <p class="text-slate-400 mt-1 uppercase font-bold text-[8px]">Doğru Rakam<br>Yanlış Yer</p>
-                 </div>
-             </div>
-         </div>
+         <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl active:scale-95 transition-all uppercase tracking-wider">Oyunu Başlat</button>
      </main>
 
      <div id="gameScreen" class="hide w-full max-w-md space-y-4">
-         <div id="playerBar" class="card-dark p-4 border-l-8 border-indigo-500 transition-all">
+         <div id="playerBar" class="card-dark p-4 border-l-8 border-indigo-500">
              <div class="flex justify-between items-center">
                  <div>
                     <p class="text-[10px] uppercase text-slate-500 font-bold">Sıra Sende</p>
@@ -118,12 +106,12 @@
                  </div>
                  <div class="flex gap-2">
                     <button onclick="getHint()" class="bg-amber-600/20 text-amber-500 text-[10px] px-3 py-2 rounded-xl font-bold border border-amber-600/30">İPUCU</button>
-                    <button onclick="location.reload()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase">Menü</button>
+                    <button onclick="backToMenu()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase hover:bg-red-600 transition">MENÜ</button>
                  </div>
              </div>
          </div>
 
-         <div class="card-dark p-8 text-center">
+         <div class="card-dark p-8 text-center" id="inputContainer">
              <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-4" placeholder="...." maxlength="4">
              <p id="errorText" class="text-red-500 text-[10px] mb-4 font-bold opacity-0 transition uppercase">Rakamlar farklı olmalı!</p>
              <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl">TAHMİN ET</button>
@@ -133,7 +121,7 @@
      </div>
 
      <script>
-         // --- 🔑 FIREBASE BİLGİLERİN (Burayı kendi panelinden kopyaladığınla güncelle) ---
+         // --- 🔑 FIREBASE KONFİGÜRASYONU (Değiştirilmeli!) ---
          const firebaseConfig = {
             apiKey: "AIza...", 
             authDomain: "tahmat-ac714.firebaseapp.com",
@@ -148,19 +136,13 @@
          const db = firebase.database();
 
          let config = { 
-            totalPlayers: 1, 
-            currentPlayer: 1, 
-            digits: 4, 
-            target: '', 
-            sound: true,
-            attempts: 0,
-            isDark: true,
+            totalPlayers: 1, currentPlayer: 1, digits: 4, target: '', sound: true, 
+            attempts: 0, startTime: 0, totalMinus: 0, isDark: true,
             playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b']
          };
          
          const audio = new (window.AudioContext || window.webkitAudioContext)();
 
-         // 🌓 TEMA DEĞİŞTİRME FONKSİYONU
          function toggleTheme() {
             config.isDark = !config.isDark;
             document.body.classList.toggle('light-theme');
@@ -171,10 +153,8 @@
          function play(f, d) {
              if(!config.sound) return;
              try {
-                const o = audio.createOscillator();
-                const g = audio.createGain();
-                o.connect(g); g.connect(audio.destination);
-                o.frequency.value = f;
+                const o = audio.createOscillator(); const g = audio.createGain();
+                o.connect(g); g.connect(audio.destination); o.frequency.value = f;
                 g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + d);
                 o.start(); o.stop(audio.currentTime + d);
              } catch(e) {}
@@ -195,74 +175,88 @@
              play(554, 0.1);
          }
 
-         function toggleSound() {
-             config.sound = !config.sound;
-             document.getElementById('soundBtn').innerText = config.sound ? 'S' : 'X';
-         }
-
          function validateInput(input) {
              input.value = input.value.replace(/[^0-9]/g, '');
              const unique = new Set(input.value);
              document.getElementById('errorText').style.opacity = (unique.size !== input.value.length) ? "1" : "0";
          }
 
+         function showAwards() {
+            document.getElementById('mainScreen').classList.add('hide');
+            document.getElementById('awardsScreen').classList.remove('hide');
+         }
+
+         function closeAwards() {
+            document.getElementById('awardsScreen').classList.add('hide');
+            document.getElementById('mainScreen').classList.remove('hide');
+         }
+
          function showLeaderboard() {
             document.getElementById('mainScreen').classList.add('hide');
-            document.getElementById('infoBanner').classList.add('hide');
             document.getElementById('leaderboardScreen').classList.remove('hide');
-            
             const list = document.getElementById('leaderList');
-            list.innerHTML = '<p class="text-center animate-pulse">Yükleniyor...</p>';
+            list.innerHTML = '<p class="text-center animate-pulse py-4">Yükleniyor...</p>';
 
-            db.ref('rekorlar').orderByChild('score').limitToFirst(10).once('value', snapshot => {
+            db.ref('rekorlar').orderByChild('score').limitToFirst(15).once('value', snapshot => {
                 list.innerHTML = '';
                 snapshot.forEach(child => {
                     const r = child.val();
+                    let b = '';
+                    if(r.score <= 5) b += '<span class="badge bg-amber-500">🚀</span>';
+                    if(r.digits == 5) b += '<span class="badge bg-indigo-500">🧠</span>';
+                    if(r.isNight) b += '<span class="badge bg-slate-600">🌙</span>';
+                    if(r.noMinus) b += '<span class="badge bg-green-500">🎯</span>';
+                    if(r.score >= 20) b += '<span class="badge bg-red-400">🐢</span>';
+                    if(r.isFast) b += '<span class="badge bg-orange-600">🔥</span>';
+                    
                     list.innerHTML += `
                         <div class="flex justify-between p-3 bg-slate-800 text-white rounded-xl border border-slate-700 animate-in fade-in">
-                            <span class="font-bold">${r.name}</span>
+                            <span><b>${r.name}</b> ${b}</span>
                             <span class="text-indigo-400 font-black">${r.score} Hamle</span>
                         </div>`;
                 });
-                if(list.innerHTML === '') list.innerHTML = '<p class="text-center text-slate-500 py-4 text-xs">Henüz dünya rekoru yok!</p>';
+                if(list.innerHTML === '') list.innerHTML = '<p class="text-center text-slate-500 py-4">Henüz rekor yok!</p>';
             });
          }
 
          function closeLeaderboard() {
             document.getElementById('leaderboardScreen').classList.add('hide');
             document.getElementById('mainScreen').classList.remove('hide');
-            document.getElementById('infoBanner').classList.remove('hide');
          }
 
          function startGame() {
              let nums = [0,1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
              if(nums[0] === 0) nums.push(nums.shift());
              config.target = nums.slice(0, config.digits).join('');
-             config.currentPlayer = 1;
-             config.attempts = 0;
+             config.currentPlayer = 1; config.attempts = 0; config.totalMinus = 0; config.startTime = Date.now();
              
              document.getElementById('infoBanner').classList.add('hide');
              document.getElementById('mainScreen').classList.add('hide');
              document.getElementById('gameScreen').classList.remove('hide');
-             updateUI();
-             play(659, 0.3);
+             updateUI(); play(659, 0.3);
+         }
+
+         function backToMenu() {
+            if(confirm("Çıkmak istiyor musun? Skorun kaydedilmeyecek.")) {
+                document.getElementById('gameScreen').classList.add('hide');
+                document.getElementById('mainScreen').classList.remove('hide');
+                document.getElementById('infoBanner').classList.remove('hide');
+                document.getElementById('history').innerHTML = '';
+            }
          }
 
          function updateUI() {
              const color = config.playerColors[config.currentPlayer - 1];
-             const pName = document.getElementById('currentPlayerName');
-             const pBar = document.getElementById('playerBar');
-             const input = document.getElementById('guessInput');
-             pName.innerText = `${config.currentPlayer}. OYUNCU`;
-             pName.style.color = color;
-             pBar.style.borderColor = color;
-             input.style.borderColor = color;
-             input.placeholder = ".".repeat(config.digits);
+             document.getElementById('currentPlayerName').innerText = `${config.currentPlayer}. OYUNCU`;
+             document.getElementById('currentPlayerName').style.color = color;
+             document.getElementById('playerBar').style.borderColor = color;
+             document.getElementById('guessInput').style.borderColor = color;
+             document.getElementById('guessInput').placeholder = ".".repeat(config.digits);
          }
 
          function getHint() {
             const randIdx = Math.floor(Math.random() * config.digits);
-            alert(`İpucu: ${randIdx + 1}. basamakta "${config.target[randIdx]}" rakamı var.`);
+            alert(`İpucu: Bir basamakta "${config.target[randIdx]}" rakamı var.`);
             config.attempts += 2;
          }
 
@@ -270,21 +264,18 @@
              const input = document.getElementById('guessInput');
              const val = input.value;
              if(val.length != config.digits) return;
-             const unique = new Set(val);
-             if(unique.size !== val.length) {
-                input.classList.add('shake');
-                play(150, 0.3);
-                setTimeout(() => input.classList.remove('shake'), 400);
-                return;
+             if(new Set(val).size !== val.length) {
+                input.classList.add('shake'); setTimeout(() => input.classList.remove('shake'), 400); return;
              }
+
              config.attempts++;
              let p=0, m=0;
-             const tArr = config.target.split('');
-             const gArr = val.split('');
-             gArr.forEach((num, i) => {
-                 if(num === tArr[i]) p++;
-                 else if(tArr.includes(num)) m++;
+             val.split('').forEach((num, i) => {
+                 if(num === config.target[i]) p++;
+                 else if(config.target.includes(num)) m++;
              });
+             config.totalMinus += m;
+
              const row = document.createElement('div');
              const color = config.playerColors[config.currentPlayer - 1];
              row.className = 'card-dark p-4 flex justify-between items-center border-r-8';
@@ -292,15 +283,24 @@
              row.innerHTML = `<div><span class="text-[9px] font-bold" style="color:${color}">OYUNCU ${config.currentPlayer}</span><p class="text-xl font-bold tracking-widest">${val}</p></div><div class="flex gap-4 text-xl font-black"><span class="text-green-500">+${p}</span><span class="text-red-500">-${m}</span></div>`;
              document.getElementById('history').prepend(row);
              input.value = '';
+
              if(val === config.target) {
-                 play(880, 0.5);
+                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                 play(880, 0.8);
+                 const duration = (Date.now() - config.startTime) / 1000;
+                 const hour = new Date().getHours();
                  setTimeout(() => {
-                     const name = prompt(`${config.currentPlayer}. OYUNCU KAZANDI! 🎉\nİsminizi girin:`);
+                     const name = prompt(`${config.currentPlayer}. OYUNCU BİLDİ! 🎉\nİsmini yaz:`);
                      if(name) {
-                        db.ref('rekorlar').push({name: name, score: config.attempts});
+                        db.ref('rekorlar').push({
+                            name: name, score: config.attempts, digits: config.digits,
+                            noMinus: m === 0 && config.totalMinus === 0, 
+                            isNight: (hour >= 22 || hour <= 6),
+                            isFast: duration < 60
+                        });
                      }
                      location.reload();
-                 }, 300);
+                 }, 500);
              } else {
                  play(330, 0.1);
                  config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1;
