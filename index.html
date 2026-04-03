@@ -11,12 +11,27 @@
      <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
      <style>
-         body { font-family: 'Fredoka', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
-         .card-dark { background-color: #1e293b; border: 1px solid #334155; border-radius: 1.5rem; }
-         .btn-opt { background-color: #334155; transition: 0.2s; cursor: pointer; border: none; outline: none; }
+         /* Tema Değişkenleri */
+         :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #ffffff;
+            --border-color: #334155;
+         }
+
+         .light-theme {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --border-color: #e2e8f0;
+         }
+
+         body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; transition: background 0.3s, color 0.3s; }
+         .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: background 0.3s, border 0.3s; }
+         .btn-opt { background-color: #334155; color: white; transition: 0.2s; cursor: pointer; border: none; outline: none; }
          .btn-active-blue { background-color: #6366f1 !important; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); transform: scale(1.05); }
          .btn-active-green { background-color: #22c55e !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); transform: scale(1.05); }
-         .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); cursor: pointer; }
+         .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); color: white; cursor: pointer; }
          .hide { display: none !important; }
          
          @keyframes notice-pulse {
@@ -32,20 +47,21 @@
 
      <div id="infoBanner" class="w-full max-w-md warning-banner p-4 rounded-2xl mb-6 text-center bg-slate-900/80">
         <h2 class="text-amber-500 font-black text-md mb-1">⚠️ ÖNEMLİ BİLGİ</h2>
-        <p class="text-xs text-slate-200">
-            <span class="text-red-500 font-bold underline">(-) EKSİ:</span> Rakam var ama <span class="text-amber-400 font-bold italic">yerini yanlış</span> koydun demektir. Rakam sayıda var!
+        <p class="text-xs text-white">
+            <span class="text-red-500 font-bold underline">(-) EKSİ:</span> Rakam var ama <span class="text-amber-400 font-bold italic">yerini yanlış</span> koydun demektir.
         </p>
      </div>
 
      <header class="w-full max-w-md flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
          <div class="flex items-center gap-3">
-             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl">T</div>
+             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl text-white">T</div>
              <div>
                  <h1 class="text-xl font-bold tracking-tight">TAHMAT</h1>
-                 <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Dünya Rekorları Aktif</p>
+                 <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Renk Modu Aktif</p>
              </div>
          </div>
          <div class="flex gap-2">
+             <button onclick="toggleTheme()" id="themeBtn" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">☀️</button>
              <button onclick="showLeaderboard()" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700 transition">🏆</button>
              <button onclick="toggleSound()" id="soundBtn" class="w-10 h-10 card-dark flex items-center justify-center text-xs hover:bg-slate-700 transition font-bold">S</button>
          </div>
@@ -54,7 +70,7 @@
      <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4">
         <h2 class="text-xl font-black text-center text-indigo-400 uppercase">🏆 DÜNYA REKORLARI</h2>
         <div id="leaderList" class="space-y-2"></div>
-        <button onclick="closeLeaderboard()" class="w-full py-3 bg-slate-700 rounded-xl font-bold uppercase text-xs">Kapat</button>
+        <button onclick="closeLeaderboard()" class="w-full py-3 bg-slate-700 text-white rounded-xl font-bold uppercase text-xs">Kapat</button>
      </div>
 
      <main id="mainScreen" class="w-full max-w-md space-y-6">
@@ -102,7 +118,7 @@
                  </div>
                  <div class="flex gap-2">
                     <button onclick="getHint()" class="bg-amber-600/20 text-amber-500 text-[10px] px-3 py-2 rounded-xl font-bold border border-amber-600/30">İPUCU</button>
-                    <button onclick="location.reload()" class="bg-slate-700 text-[10px] px-3 py-2 rounded-xl font-bold uppercase">Menü</button>
+                    <button onclick="location.reload()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase">Menü</button>
                  </div>
              </div>
          </div>
@@ -117,7 +133,7 @@
      </div>
 
      <script>
-         // --- 🔑 BURAYI KENDİ FIREBASE BİLGİLERİNLE DOLDUR ---
+         // --- 🔑 FIREBASE BİLGİLERİN (Burayı kendi panelinden kopyaladığınla güncelle) ---
          const firebaseConfig = {
             apiKey: "AIza...", 
             authDomain: "tahmat-ac714.firebaseapp.com",
@@ -128,7 +144,6 @@
             appId: "APP_ID"
          };
 
-         // Firebase Başlat
          firebase.initializeApp(firebaseConfig);
          const db = firebase.database();
 
@@ -139,10 +154,19 @@
             target: '', 
             sound: true,
             attempts: 0,
+            isDark: true,
             playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b']
          };
          
          const audio = new (window.AudioContext || window.webkitAudioContext)();
+
+         // 🌓 TEMA DEĞİŞTİRME FONKSİYONU
+         function toggleTheme() {
+            config.isDark = !config.isDark;
+            document.body.classList.toggle('light-theme');
+            document.getElementById('themeBtn').innerText = config.isDark ? '☀️' : '🌙';
+            play(800, 0.1);
+         }
 
          function play(f, d) {
              if(!config.sound) return;
@@ -195,7 +219,7 @@
                 snapshot.forEach(child => {
                     const r = child.val();
                     list.innerHTML += `
-                        <div class="flex justify-between p-3 bg-slate-800 rounded-xl border border-slate-700 animate-in fade-in">
+                        <div class="flex justify-between p-3 bg-slate-800 text-white rounded-xl border border-slate-700 animate-in fade-in">
                             <span class="font-bold">${r.name}</span>
                             <span class="text-indigo-400 font-black">${r.score} Hamle</span>
                         </div>`;
