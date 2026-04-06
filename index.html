@@ -11,20 +11,36 @@
      <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
      <style>
-         :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #ffffff; --border-color: #334155; }
-         .light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --border-color: #e2e8f0; }
+         :root { 
+            --bg-color: #0f172a; 
+            --card-bg: #1e293b; 
+            --text-main: #ffffff; 
+            --border-color: #334155; 
+            --input-text: #ffffff;
+         }
+         /* ☀️ AYDINLIK MOD DÜZELTMELERİ */
+         .light-theme { 
+            --bg-color: #f1f5f9; 
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --border-color: #cbd5e1; 
+            --input-text: #1e293b; /* Sayıların görünmesi için koyu renk */
+         }
          body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
-         .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; }
+         .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; color: var(--text-main); }
          .btn-opt { background-color: #334155; color: white; border: none; }
-         .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); }
-         .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); }
-         .btn-active-red { background-color: #ef4444 !important; transform: scale(1.05); }
+         .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); color: white; }
+         .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); color: white; }
+         .btn-active-red { background-color: #ef4444 !important; transform: scale(1.05); color: white; }
          .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); color: white; cursor: pointer; }
          .hide { display: none !important; }
+         #guessInput { color: var(--input-text); } /* Giriş alanındaki sayı rengi */
+         .history-item { color: var(--text-main); }
+         
          #authModal { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); }
          .avatar-choice { font-size: 2rem; cursor: pointer; padding: 10px; border-radius: 1rem; border: 2px solid transparent; }
          .avatar-selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.2); }
-         .tab-btn { padding: 8px 16px; border-radius: 12px; font-weight: bold; font-size: 11px; background: #334155; transition: 0.2s; color: #94a3b8; }
+         .tab-btn { padding: 8px 16px; border-radius: 12px; font-weight: bold; font-size: 11px; background: #334155; transition: 0.2s; color: #ffffff; }
          .tab-active { background: #6366f1; color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
      </style>
 </head>
@@ -120,11 +136,11 @@
             <button onclick="loadLeaderboard(4)" id="tab4" class="tab-btn tab-active">4 <span data-lang="digits">BASAMAK</span></button>
             <button onclick="loadLeaderboard(5)" id="tab5" class="tab-btn">5 <span data-lang="digits">BASAMAK</span></button>
         </div>
-        <div id="leaderList" class="space-y-2 max-h-[350px] overflow-y-auto pr-2 text-white text-sm"></div>
+        <div id="leaderList" class="space-y-2 max-h-[350px] overflow-y-auto pr-2 text-sm"></div>
         <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase" data-lang="backBtn">Geri Dön</button>
     </div>
 
-    <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center text-white">
+    <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
         <div id="profAv" class="text-7xl mx-auto w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center border-2 border-indigo-500">🤖</div>
         <h2 id="profName" class="text-3xl font-black uppercase text-indigo-400">...</h2>
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
@@ -136,13 +152,13 @@
 
     <div id="awardsScreen" class="hide w-full max-w-md card-dark p-8 space-y-6">
         <h2 class="text-xl font-black text-center text-amber-500 uppercase" data-lang="awardsTitle">🏅 BAŞARIMLAR</h2>
-        <div class="space-y-3 text-sm text-white" id="awardsList"></div>
+        <div class="space-y-3 text-sm" id="awardsList"></div>
         <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase" data-lang="backBtn">Kapat</button>
     </div>
 
     <div id="gameScreen" class="hide w-full max-w-md space-y-4">
         <div id="playerBar" class="card-dark p-4 border-l-8 border-indigo-500 shadow-lg">
-            <div class="flex justify-between items-center text-white">
+            <div class="flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <div id="curAv" class="text-3xl">🤖</div>
                     <div><p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" data-lang="turnLabel">SIRA SENDE</p><h2 id="curName" class="text-xl font-black text-indigo-400">...</h2></div>
@@ -151,12 +167,12 @@
                 <button onclick="backToMenu()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase" data-lang="exitBtn">ÇIK</button>
             </div>
         </div>
-        <div class="card-dark p-8 text-center">
+        <div class="card-dark p-8 text-center shadow-lg">
             <p id="errorMsg" class="text-red-500 text-[10px] font-bold mb-2 uppercase opacity-0 transition" data-lang="errDiff">Rakamlar farklı olmalı!</p>
-            <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-white text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-6" placeholder="....">
+            <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-6" placeholder="....">
             <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl uppercase shadow-lg" data-lang="guessBtn">Tahmin Et</button>
         </div>
-        <div id="history" class="space-y-2 overflow-y-auto max-h-[250px] pr-2 text-white"></div>
+        <div id="history" class="space-y-2 overflow-y-auto max-h-[250px] pr-2"></div>
     </div>
 
     <script>
@@ -201,6 +217,13 @@
         let user = { name: '', avatar: '🤖', pass: '', wins: 0 };
         let config = { totalPlayers: 1, currentPlayer: 1, digits: 4, target: '', attempts: 0, isTimeMode: false, timeLeft: 0, timerInterval: null, isDark: true, playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b'] };
 
+        function toggleTheme() {
+            config.isDark = !config.isDark;
+            document.body.classList.toggle('light-theme');
+            // ✅ SİMGE GÜNCELLEME BURADA
+            document.getElementById('themeBtn').innerText = config.isDark ? "🌙" : "☀️";
+        }
+
         function setLang(l) {
             curLang = l;
             document.querySelectorAll('[data-lang]').forEach(el => {
@@ -213,7 +236,6 @@
             document.getElementById('guessInput').placeholder = ".".repeat(config.digits);
         }
 
-        // AYARLAR
         function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); document.getElementById('guessInput').placeholder = ".".repeat(n); }
         function setPlayers(n) { config.totalPlayers = n; document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue')); document.getElementById('p'+n).classList.add('btn-active-blue'); }
         function setTimeMode(v) { config.isTimeMode = v; document.getElementById('modeNormal').classList.toggle('btn-active-blue', !v); document.getElementById('modeTime').classList.toggle('btn-active-red', v); }
@@ -240,8 +262,9 @@
             config.attempts++;
             let p=0, m=0;
             val.split('').forEach((n, i) => { if(n === config.target[i]) p++; else if(config.target.includes(n)) m++; });
+            
             const row = document.createElement('div');
-            row.className = 'card-dark p-4 flex justify-between items-center mb-2 border-r-8 bg-slate-800/40';
+            row.className = 'card-dark p-4 flex justify-between items-center mb-2 border-r-8 bg-slate-800/40 history-item';
             row.style.borderColor = config.playerColors[config.currentPlayer - 1];
             row.innerHTML = `<p class="font-bold tracking-widest text-xl">${val}</p><div class="flex gap-4 font-black"><span class="text-green-500">+${p}</span><span class="text-red-500">-${m}</span></div>`;
             document.getElementById('history').prepend(row);
@@ -307,7 +330,7 @@
                 const list = document.getElementById('leaderList'); list.innerHTML = '';
                 s.forEach(c => {
                     const r = c.val();
-                    list.innerHTML += `<div class="flex justify-between p-4 bg-slate-800/60 rounded-2xl border border-slate-700 mb-2"><span>${r.avatar || '🤖'} <b>${r.name}</b></span><span class="text-indigo-400 font-bold">${r.score}${translations[curLang].attempt}</span></div>`;
+                    list.innerHTML += `<div class="card-dark p-4 flex justify-between items-center mb-2 border border-slate-700"><span>${r.avatar || '🤖'} <b>${r.name}</b></span><span class="text-indigo-400 font-bold">${r.score}${translations[curLang].attempt}</span></div>`;
                 });
             });
         }
@@ -316,7 +339,6 @@
         function showScreen(id) { document.querySelectorAll('main, div[id$="Screen"], #infoBanner').forEach(s => s.classList.add('hide')); document.getElementById(id).classList.remove('hide'); if(id === 'leaderboardScreen') loadLeaderboard(config.digits); if(id === 'profileScreen') updateProfileUI(); }
         function closeAllScreens() { document.querySelectorAll('div[id$="Screen"]').forEach(s => s.classList.add('hide')); document.getElementById('mainScreen').classList.remove('hide'); document.getElementById('infoBanner').classList.remove('hide'); }
         function backToMenu() { clearInterval(config.timerInterval); closeAllScreens(); }
-        function toggleTheme() { config.isDark = !config.isDark; document.body.classList.toggle('light-theme'); }
         function validateInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); const hasDup = new Set(el.value).size !== el.value.length; document.getElementById('errorMsg').style.opacity = hasDup ? "1" : "0"; }
         function pickAv(av, el) { user.avatar = av; document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected')); el.classList.add('avatar-selected'); }
         function updateProfileUI() { document.getElementById('profAv').innerText = user.avatar; document.getElementById('profName').innerText = user.name; document.getElementById('profWins').innerText = user.wins || 0; }
