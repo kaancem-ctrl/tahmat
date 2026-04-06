@@ -3,7 +3,7 @@
 <head>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>TahMat Pro Ultimate</title>
+     <title>TahMat Pro Multi-Lang</title>
      <script src="https://cdn.tailwindcss.com"></script>
      <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
      <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -32,7 +32,7 @@
 
     <div id="authModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="card-dark w-full max-w-sm p-8 space-y-6 text-center border-2 border-indigo-500 shadow-2xl">
-            <h2 class="text-2xl font-black text-indigo-400 uppercase tracking-tighter">TAHMAT GİRİŞ</h2>
+            <h2 class="text-2xl font-black text-indigo-400 uppercase tracking-tighter" data-lang="authTitle">TAHMAT GİRİŞ</h2>
             <div class="space-y-3">
                 <input type="text" id="authName" placeholder="Kullanıcı Adı" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
                 <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
@@ -45,15 +45,15 @@
                 <div onclick="pickAv('👽', this)" class="avatar-choice">👽</div>
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="handleAuth('login')" class="bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl font-black uppercase text-xs transition">Giriş Yap</button>
-                <button onclick="handleAuth('register')" class="bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black uppercase text-xs transition">Kayıt Ol</button>
+                <button onclick="handleAuth('login')" class="bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl font-black uppercase text-xs transition" data-lang="loginBtn">Giriş Yap</button>
+                <button onclick="handleAuth('register')" class="bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black uppercase text-xs transition" data-lang="regBtn">Kayıt Ol</button>
             </div>
         </div>
     </div>
 
     <div id="infoBanner" class="w-full max-w-md p-4 rounded-2xl mb-6 text-center bg-slate-900/80 border-2 border-amber-500">
-        <h2 class="text-amber-500 font-black text-md mb-1 uppercase">⚠️ Bilgi</h2>
-        <p class="text-xs text-white">
+        <h2 class="text-amber-500 font-black text-md mb-1 uppercase" data-lang="infoTitle">⚠️ Bilgi</h2>
+        <p class="text-xs text-white" id="infoText">
             <span class="text-green-500 font-bold underline">(+) ARTI:</span> Doğru rakam, doğru yer.<br>
             <span class="text-red-500 font-bold underline">(-) EKSİ:</span> Doğru rakam, yanlış yer.
         </p>
@@ -64,28 +64,36 @@
             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl text-white">T</div>
             <div>
                 <h1 class="text-xl font-bold uppercase tracking-tight">TAHMAT</h1>
-                <button onclick="showScreen('profileScreen')" id="topUser" class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest hover:underline cursor-pointer">Yükleniyor...</button>
+                <button onclick="showScreen('profileScreen')" id="topUser" class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest hover:underline cursor-pointer">...</button>
             </div>
         </div>
         <div class="flex gap-2">
-            <button id="themeBtn" onclick="toggleTheme()" class="w-10 h-10 card-dark flex items-center justify-center text-lg shadow-sm">🌙</button>
-            <button onclick="showScreen('awardsScreen')" class="w-10 h-10 card-dark flex items-center justify-center text-lg shadow-sm">🏅</button>
-            <button onclick="showScreen('leaderboardScreen')" class="w-10 h-10 card-dark flex items-center justify-center text-lg shadow-sm">🏆</button>
-            <button onclick="logout()" class="w-10 h-10 card-dark flex items-center justify-center text-[10px] text-red-500 font-bold">KAPAT</button>
+            <button id="themeBtn" onclick="toggleTheme()" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🌙</button>
+            <button onclick="showScreen('awardsScreen')" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🏅</button>
+            <button onclick="showScreen('leaderboardScreen')" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🏆</button>
+            <button onclick="logout()" class="w-10 h-10 card-dark flex items-center justify-center text-[10px] text-red-500 font-bold uppercase" data-lang="logout">KAPAT</button>
         </div>
     </header>
 
     <main id="mainScreen" class="w-full max-w-md space-y-4">
-        <div class="card-dark p-6 text-center">
-            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase">Oyun Modu</h3>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="setTimeMode(false)" id="modeNormal" class="btn-opt py-3 rounded-xl font-bold btn-active-blue transition">STANDART</button>
-                <button onclick="setTimeMode(true)" id="modeTime" class="btn-opt py-3 rounded-xl font-bold transition">⏱️ SÜRELİ</button>
+        <div class="card-dark p-4 text-center">
+            <div class="flex justify-center gap-4">
+                <button onclick="setLang('tr')" class="text-2xl hover:scale-110 transition">🇹🇷</button>
+                <button onclick="setLang('en')" class="text-2xl hover:scale-110 transition">🇺🇸</button>
+                <button onclick="setLang('de')" class="text-2xl hover:scale-110 transition">🇩🇪</button>
             </div>
         </div>
 
         <div class="card-dark p-6 text-center">
-            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase">Oyuncu Sayısı</h3>
+            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="modeLabel">Oyun Modu</h3>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="setTimeMode(false)" id="modeNormal" class="btn-opt py-3 rounded-xl font-bold btn-active-blue transition" data-lang="modeStandart">STANDART</button>
+                <button onclick="setTimeMode(true)" id="modeTime" class="btn-opt py-3 rounded-xl font-bold transition" data-lang="modeTimed">⏱️ SÜRELİ</button>
+            </div>
+        </div>
+
+        <div class="card-dark p-6 text-center">
+            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="playerLabel">Oyuncu Sayısı</h3>
             <div class="grid grid-cols-4 gap-2">
                 <button onclick="setPlayers(1)" id="p1" class="btn-opt py-3 rounded-xl font-bold btn-active-blue transition">1</button>
                 <button onclick="setPlayers(2)" id="p2" class="btn-opt py-3 rounded-xl font-bold transition">2</button>
@@ -95,45 +103,41 @@
         </div>
 
         <div class="card-dark p-6 text-center">
-            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase">Basamak Sayısı</h3>
+            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="digitLabel">Basamak Sayısı</h3>
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="setDigits(3)" id="d3" class="btn-opt py-3 rounded-xl font-bold transition">3</button>
                 <button onclick="setDigits(4)" id="d4" class="btn-opt py-3 rounded-xl font-bold btn-active-green transition">4</button>
                 <button onclick="setDigits(5)" id="d5" class="btn-opt py-3 rounded-xl font-bold transition">5</button>
             </div>
         </div>
-        <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl uppercase transition hover:scale-[1.02] active:scale-95">Oyunu Başlat</button>
+        <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl uppercase transition hover:scale-[1.02]" data-lang="startBtn">Oyunu Başlat</button>
     </main>
 
     <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4">
-        <h2 class="text-xl font-black text-center text-indigo-400 uppercase tracking-widest">🏆 REKORLAR</h2>
+        <h2 class="text-xl font-black text-center text-indigo-400 uppercase tracking-widest" data-lang="leaderTitle">🏆 REKORLAR</h2>
         <div class="flex justify-center gap-2 mb-2">
-            <button onclick="loadLeaderboard(3)" id="tab3" class="tab-btn">3 BASAMAK</button>
-            <button onclick="loadLeaderboard(4)" id="tab4" class="tab-btn tab-active">4 BASAMAK</button>
-            <button onclick="loadLeaderboard(5)" id="tab5" class="tab-btn">5 BASAMAK</button>
+            <button onclick="loadLeaderboard(3)" id="tab3" class="tab-btn">3 <span data-lang="digits">BASAMAK</span></button>
+            <button onclick="loadLeaderboard(4)" id="tab4" class="tab-btn tab-active">4 <span data-lang="digits">BASAMAK</span></button>
+            <button onclick="loadLeaderboard(5)" id="tab5" class="tab-btn">5 <span data-lang="digits">BASAMAK</span></button>
         </div>
         <div id="leaderList" class="space-y-2 max-h-[350px] overflow-y-auto pr-2 text-white text-sm"></div>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase">Geri Dön</button>
+        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase" data-lang="backBtn">Geri Dön</button>
     </div>
 
     <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center text-white">
         <div id="profAv" class="text-7xl mx-auto w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center border-2 border-indigo-500">🤖</div>
-        <h2 id="profName" class="text-3xl font-black uppercase text-indigo-400">OYUNCU</h2>
+        <h2 id="profName" class="text-3xl font-black uppercase text-indigo-400">...</h2>
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Toplam Galibiyet</p>
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" data-lang="totalWins">Toplam Galibiyet</p>
             <span id="profWins" class="text-3xl font-black text-green-400">0</span>
         </div>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase">Geri Dön</button>
+        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase" data-lang="backBtn">Geri Dön</button>
     </div>
 
     <div id="awardsScreen" class="hide w-full max-w-md card-dark p-8 space-y-6">
-        <h2 class="text-xl font-black text-center text-amber-500 uppercase">🏅 BAŞARIMLAR</h2>
-        <div class="space-y-3 text-sm text-white">
-            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">🚀 <b>Işık Hızı:</b> 5 hamle altı bitir.</div>
-            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">🧠 <b>Zihin Ustası:</b> 5 basamaklı modu bitir.</div>
-            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">🎯 <b>Tam İsabet:</b> Hiç (-) almadan bitir.</div>
-        </div>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase">Kapat</button>
+        <h2 class="text-xl font-black text-center text-amber-500 uppercase" data-lang="awardsTitle">🏅 BAŞARIMLAR</h2>
+        <div class="space-y-3 text-sm text-white" id="awardsList"></div>
+        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase" data-lang="backBtn">Kapat</button>
     </div>
 
     <div id="gameScreen" class="hide w-full max-w-md space-y-4">
@@ -141,16 +145,16 @@
             <div class="flex justify-between items-center text-white">
                 <div class="flex items-center gap-3">
                     <div id="curAv" class="text-3xl">🤖</div>
-                    <div><p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">SIRA SENDE</p><h2 id="curName" class="text-xl font-black text-indigo-400">...</h2></div>
+                    <div><p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" data-lang="turnLabel">SIRA SENDE</p><h2 id="curName" class="text-xl font-black text-indigo-400">...</h2></div>
                 </div>
                 <div id="timerDisplay" class="hide text-2xl font-black px-4 py-2 bg-slate-800 border-2 border-red-500 rounded-xl text-red-500">00</div>
-                <button onclick="backToMenu()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase">ÇIK</button>
+                <button onclick="backToMenu()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase" data-lang="exitBtn">ÇIK</button>
             </div>
         </div>
         <div class="card-dark p-8 text-center">
-            <p id="errorMsg" class="text-red-500 text-[10px] font-bold mb-2 uppercase opacity-0 transition">Rakamlar farklı olmalı!</p>
+            <p id="errorMsg" class="text-red-500 text-[10px] font-bold mb-2 uppercase opacity-0 transition" data-lang="errDiff">Rakamlar farklı olmalı!</p>
             <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-white text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-6" placeholder="....">
-            <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl uppercase shadow-lg">Tahmin Et</button>
+            <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl uppercase shadow-lg" data-lang="guessBtn">Tahmin Et</button>
         </div>
         <div id="history" class="space-y-2 overflow-y-auto max-h-[250px] pr-2 text-white"></div>
     </div>
@@ -160,10 +164,57 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        let curLang = 'tr';
+        const translations = {
+            tr: {
+                authTitle: "TAHMAT GİRİŞ", loginBtn: "Giriş Yap", regBtn: "Kayıt Ol", infoTitle: "⚠️ Bilgi",
+                infoBody: '<span class="text-green-500 font-bold underline">(+) ARTI:</span> Doğru rakam, doğru yer.<br><span class="text-red-500 font-bold underline">(-) EKSİ:</span> Doğru rakam, yanlış yer.',
+                modeLabel: "Oyun Modu", modeStandart: "STANDART", modeTimed: "⏱️ SÜRELİ", playerLabel: "Oyuncu Sayısı",
+                digitLabel: "Basamak Sayısı", startBtn: "Oyunu Başlat", leaderTitle: "🏆 REKORLAR", digits: "BASAMAK",
+                backBtn: "Geri Dön", totalWins: "Toplam Galibiyet", awardsTitle: "🏅 BAŞARIMLAR", turnLabel: "SIRA SENDE",
+                exitBtn: "ÇIK", errDiff: "Rakamlar farklı olmalı!", guessBtn: "Tahmin Et", logout: "KAPAT",
+                awards: ["🚀 <b>Işık Hızı:</b> 5 hamle altı bitir.", "🧠 <b>Zihin Ustası:</b> 5 basamaklı modu bitir.", "🎯 <b>Tam İsabet:</b> Hiç (-) almadan bitir."],
+                winMsg: "TEBRİKLER! {n} hamlede buldun.", timeUp: "Süre Bitti! Sayı: ", attempt: " Hamle"
+            },
+            en: {
+                authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info",
+                infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Correct digit, correct place.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Correct digit, wrong place.',
+                modeLabel: "Game Mode", modeStandart: "STANDARD", modeTimed: "⏱️ TIMED", playerLabel: "Players",
+                digitLabel: "Digits", startBtn: "Start Game", leaderTitle: "🏆 LEADERBOARD", digits: "DIGITS",
+                backBtn: "Back", totalWins: "Total Wins", awardsTitle: "🏅 ACHIEVEMENTS", turnLabel: "YOUR TURN",
+                exitBtn: "EXIT", errDiff: "Digits must be unique!", guessBtn: "Guess", logout: "CLOSE",
+                awards: ["🚀 <b>Light Speed:</b> Finish in under 5 moves.", "🧠 <b>Mind Master:</b> Finish 5-digit mode.", "🎯 <b>Bullseye:</b> Finish with zero (-) points."],
+                winMsg: "CONGRATS! Found in {n} moves.", timeUp: "Time's Up! Number: ", attempt: " Moves"
+            },
+            de: {
+                authTitle: "TAHMAT LOGIN", loginBtn: "Anmelden", regBtn: "Registrieren", infoTitle: "⚠️ Info",
+                infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Richtige Ziffer, richtiger Ort.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Richtige Ziffer, falscher Ort.',
+                modeLabel: "Spielmodus", modeStandart: "STANDARD", modeTimed: "⏱️ ZEITMODUS", playerLabel: "Spieler",
+                digitLabel: "Ziffern", startBtn: "Spiel Starten", leaderTitle: "🏆 BESTENLISTE", digits: "STELLEN",
+                backBtn: "Zurück", totalWins: "Gesamtsiege", awardsTitle: "🏅 ERFOLGE", turnLabel: "DU BIST DRAN",
+                exitBtn: "ENDE", errDiff: "Ziffern müssen unterschiedlich sein!", guessBtn: "Raten", logout: "AUS",
+                awards: ["🚀 <b>Lichtgeschwindigkeit:</b> Unter 5 Zügen beenden.", "🧠 <b>Meister:</b> 5-Stellen-Modus beenden.", "🎯 <b>Volltreffer:</b> Ohne (-) Punkte beenden."],
+                winMsg: "GLÜCKWUNSCH! In {n} Zügen gefunden.", timeUp: "Zeit abgelaufen! Zahl: ", attempt: " Züge"
+            }
+        };
+
         let user = { name: '', avatar: '🤖', pass: '', wins: 0 };
         let config = { totalPlayers: 1, currentPlayer: 1, digits: 4, target: '', attempts: 0, isTimeMode: false, timeLeft: 0, timerInterval: null, isDark: true, playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b'] };
 
-        function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); }
+        function setLang(l) {
+            curLang = l;
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                el.innerHTML = translations[l][key] || el.innerHTML;
+            });
+            document.getElementById('infoText').innerHTML = translations[l].infoBody;
+            const alist = document.getElementById('awardsList');
+            alist.innerHTML = translations[l].awards.map(a => `<div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">${a}</div>`).join('');
+            document.getElementById('guessInput').placeholder = ".".repeat(config.digits);
+        }
+
+        // AYARLAR
+        function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); document.getElementById('guessInput').placeholder = ".".repeat(n); }
         function setPlayers(n) { config.totalPlayers = n; document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue')); document.getElementById('p'+n).classList.add('btn-active-blue'); }
         function setTimeMode(v) { config.isTimeMode = v; document.getElementById('modeNormal').classList.toggle('btn-active-blue', !v); document.getElementById('modeTime').classList.toggle('btn-active-red', v); }
 
@@ -172,29 +223,23 @@
             if(ns[0] === 0) ns.push(ns.shift());
             config.target = ns.slice(0, config.digits).join('');
             config.attempts = 0; config.currentPlayer = 1;
-            
             showScreen('gameScreen');
             document.getElementById('history').innerHTML = '';
             updateGameUI();
-
             if(config.isTimeMode) {
                 config.timeLeft = config.digits * 20;
                 document.getElementById('timerDisplay').classList.remove('hide');
                 startTimer();
-            } else {
-                document.getElementById('timerDisplay').classList.add('hide');
-            }
+            } else document.getElementById('timerDisplay').classList.add('hide');
         }
 
         function makeGuess() {
             const input = document.getElementById('guessInput');
             const val = input.value;
             if(val.length != config.digits || new Set(val).size !== val.length) return;
-
             config.attempts++;
             let p=0, m=0;
             val.split('').forEach((n, i) => { if(n === config.target[i]) p++; else if(config.target.includes(n)) m++; });
-
             const row = document.createElement('div');
             row.className = 'card-dark p-4 flex justify-between items-center mb-2 border-r-8 bg-slate-800/40';
             row.style.borderColor = config.playerColors[config.currentPlayer - 1];
@@ -210,7 +255,7 @@
                     user.wins = (user.wins || 0) + 1;
                     db.ref('users/' + user.name).update({ wins: user.wins });
                 }
-                setTimeout(() => { alert("Tebrikler!"); backToMenu(); }, 500);
+                setTimeout(() => { alert(translations[curLang].winMsg.replace('{n}', config.attempts)); backToMenu(); }, 500);
             } else {
                 config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1;
                 updateGameUI();
@@ -222,31 +267,28 @@
             config.timerInterval = setInterval(() => {
                 config.timeLeft--;
                 document.getElementById('timerDisplay').innerText = config.timeLeft;
-                if(config.timeLeft <= 0) { clearInterval(config.timerInterval); alert("Süre Bitti!"); backToMenu(); }
+                if(config.timeLeft <= 0) { clearInterval(config.timerInterval); alert(translations[curLang].timeUp + config.target); backToMenu(); }
             }, 1000);
         }
 
         function updateGameUI() {
             const c = config.playerColors[config.currentPlayer - 1];
             document.getElementById('curAv').innerText = config.totalPlayers > 1 ? '👤' : user.avatar;
-            document.getElementById('curName').innerText = config.totalPlayers > 1 ? `OYUNCU ${config.currentPlayer}` : user.name;
+            document.getElementById('curName').innerText = config.totalPlayers > 1 ? `P${config.currentPlayer}` : user.name;
             document.getElementById('curName').style.color = c;
             document.getElementById('playerBar').style.borderColor = c;
             document.getElementById('guessInput').maxLength = config.digits;
-            document.getElementById('guessInput').placeholder = ".".repeat(config.digits);
         }
 
         function handleAuth(type) {
             const n = document.getElementById('authName').value.trim().toLowerCase();
             const p = document.getElementById('authPass').value.trim();
-            if(n.length < 2) return alert("Hata!");
+            if(n.length < 2) return;
             db.ref('users/' + n).once('value', s => {
                 if(type === 'login') {
                     if(s.val() && s.val().pass === p) { user = { ...s.val(), name: n }; loginSuccess(); }
-                    else alert("Hata!");
                 } else {
-                    if(s.exists()) alert("İsim alınmış!");
-                    else { user = { name: n, pass: p, avatar: user.avatar, wins: 0 }; db.ref('users/' + n).set(user).then(loginSuccess); }
+                    if(!s.exists()) { user = { name: n, pass: p, avatar: user.avatar, wins: 0 }; db.ref('users/' + n).set(user).then(loginSuccess); }
                 }
             });
         }
@@ -255,23 +297,24 @@
             localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass}));
             document.getElementById('authModal').classList.add('hide');
             document.getElementById('topUser').innerText = `${user.avatar} ${user.name}`;
+            setLang(curLang);
         }
 
         function loadLeaderboard(digit) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
             document.getElementById('tab' + digit).classList.add('tab-active');
-            db.ref('rekorlar/' + digit).orderByChild('score').limitToFirst(20).once('value', s => {
+            db.ref('rekorlar/' + digit).orderByChild('score').limitToFirst(15).once('value', s => {
                 const list = document.getElementById('leaderList'); list.innerHTML = '';
                 s.forEach(c => {
                     const r = c.val();
-                    list.innerHTML += `<div class="flex justify-between p-4 bg-slate-800/60 rounded-2xl border border-slate-700 mb-2"><span>${r.avatar || '🤖'} <b>${r.name}</b></span><span class="text-indigo-400 font-bold">${r.score} Hamle</span></div>`;
+                    list.innerHTML += `<div class="flex justify-between p-4 bg-slate-800/60 rounded-2xl border border-slate-700 mb-2"><span>${r.avatar || '🤖'} <b>${r.name}</b></span><span class="text-indigo-400 font-bold">${r.score}${translations[curLang].attempt}</span></div>`;
                 });
             });
         }
 
         function logout() { localStorage.removeItem('tahmat_user'); location.reload(); }
-        function showScreen(id) { document.querySelectorAll('main, div[id$="Screen"]').forEach(s => s.classList.add('hide')); document.getElementById(id).classList.remove('hide'); if(id === 'leaderboardScreen') loadLeaderboard(config.digits); }
-        function closeAllScreens() { document.querySelectorAll('div[id$="Screen"]').forEach(s => s.classList.add('hide')); document.getElementById('mainScreen').classList.remove('hide'); }
+        function showScreen(id) { document.querySelectorAll('main, div[id$="Screen"], #infoBanner').forEach(s => s.classList.add('hide')); document.getElementById(id).classList.remove('hide'); if(id === 'leaderboardScreen') loadLeaderboard(config.digits); if(id === 'profileScreen') updateProfileUI(); }
+        function closeAllScreens() { document.querySelectorAll('div[id$="Screen"]').forEach(s => s.classList.add('hide')); document.getElementById('mainScreen').classList.remove('hide'); document.getElementById('infoBanner').classList.remove('hide'); }
         function backToMenu() { clearInterval(config.timerInterval); closeAllScreens(); }
         function toggleTheme() { config.isDark = !config.isDark; document.body.classList.toggle('light-theme'); }
         function validateInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); const hasDup = new Set(el.value).size !== el.value.length; document.getElementById('errorMsg').style.opacity = hasDup ? "1" : "0"; }
@@ -279,6 +322,7 @@
         function updateProfileUI() { document.getElementById('profAv').innerText = user.avatar; document.getElementById('profName').innerText = user.name; document.getElementById('profWins').innerText = user.wins || 0; }
 
         window.onload = () => {
+            setLang('tr');
             const saved = localStorage.getItem('tahmat_user');
             if(saved) {
                 const p = JSON.parse(saved);
