@@ -100,7 +100,7 @@
         <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl uppercase transition hover:scale-[1.02] active:scale-95">Oyunu Başlat</button>
     </main>
 
-    <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center animate-in fade-in">
+    <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
         <div id="profAv" class="text-7xl mx-auto w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center border-2 border-indigo-500 shadow-xl">🤖</div>
         <h2 id="profName" class="text-3xl font-black uppercase text-indigo-400">OYUNCU</h2>
         <div class="grid grid-cols-2 gap-4">
@@ -116,7 +116,7 @@
         <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase">Geri Dön</button>
     </div>
 
-    <div id="awardsScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 animate-in fade-in">
+    <div id="awardsScreen" class="hide w-full max-w-md card-dark p-8 space-y-6">
         <h2 class="text-xl font-black text-center text-amber-500 uppercase italic border-b border-slate-700 pb-4">🏅 BAŞARIMLAR</h2>
         <div class="space-y-3 text-sm">
             <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">🚀 <b>Işık Hızı:</b> 5 hamle altı bitir.</div>
@@ -126,7 +126,7 @@
         <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase">Kapat</button>
     </div>
 
-    <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 animate-in fade-in">
+    <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-8 space-y-6">
         <h2 class="text-xl font-black text-center text-indigo-400 uppercase border-b border-slate-700 pb-4">🏆 REKORLAR</h2>
         <div id="leaderList" class="space-y-2 max-h-[350px] overflow-y-auto pr-2"></div>
         <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-bold uppercase">Kapat</button>
@@ -148,7 +148,7 @@
             <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-6 focus:border-cyan-400 transition-colors" placeholder="....">
             <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl uppercase shadow-lg">Tahmin Et</button>
         </div>
-        <div id="history" class="space-y-2 overflow-y-auto max-h-[280px] pr-2"></div>
+        <div id="history" class="space-y-2 overflow-y-auto max-h-[280px] pr-2 text-white"></div>
     </div>
 
     <div id="footerInfo" class="w-full max-w-md mt-6 p-4 card-dark text-[11px] text-slate-400 leading-relaxed">
@@ -169,7 +169,7 @@
         let user = { name: '', avatar: '🤖', pass: '', wins: 0, bestScore: Infinity };
         let config = { totalPlayers: 1, currentPlayer: 1, digits: 4, target: '', attempts: 0, isTimeMode: false, timeLeft: 0, timerInterval: null, isDark: true, playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b'] };
 
-        // 🌗 TEMA VE EKRAN KONTROLÜ (KESİN ÇÖZÜM)
+        // 🌗 TEMA VE EKRAN KONTROLÜ
         function toggleTheme() {
             config.isDark = !config.isDark;
             document.body.classList.toggle('light-theme');
@@ -177,18 +177,10 @@
         }
 
         function showScreen(id) {
-            // Tüm ana ekranları kapat
             const screens = ['mainScreen', 'gameScreen', 'awardsScreen', 'leaderboardScreen', 'profileScreen', 'infoBanner', 'footerInfo'];
-            screens.forEach(s => {
-                const el = document.getElementById(s);
-                if(el) el.classList.add('hide');
-            });
-            // İstediğini aç
+            screens.forEach(s => document.getElementById(s)?.classList.add('hide'));
             document.getElementById(id).classList.remove('hide');
-            
-            // Eğer Liderlik ise verileri çek
             if(id === 'leaderboardScreen') loadLeaderboard();
-            // Eğer Profil ise verileri güncelle
             if(id === 'profileScreen') updateProfileUI();
         }
 
@@ -200,24 +192,40 @@
             document.getElementById('footerInfo').classList.remove('hide');
         }
 
-        function updateProfileUI() {
-            document.getElementById('profAv').innerText = user.avatar;
-            document.getElementById('profName').innerText = user.name;
-            document.getElementById('profWins').innerText = user.wins || 0;
-            document.getElementById('profBest').innerText = (user.bestScore === Infinity || !user.bestScore) ? '--' : user.bestScore + " Hamle";
-        }
+        // 🔐 GİRİŞ & KAYIT (GÜNCELLENDİ)
+        function handleAuth(type) {
+            const n = document.getElementById('authName').value.trim().toLowerCase();
+            const p = document.getElementById('authPass').value.trim();
+            if(n.length < 2 || p.length < 3) return alert("İsim min 2, Şifre min 3!");
 
-        function loadLeaderboard() {
-            db.ref('rekorlar').limitToLast(15).once('value', s => {
-                const list = document.getElementById('leaderList'); list.innerHTML = '';
-                let res = []; s.forEach(c => res.push(c.val()));
-                res.sort((a,b) => a.score - b.score).forEach(r => {
-                    list.innerHTML += `<div class="flex justify-between p-4 bg-slate-800/60 rounded-2xl border border-slate-700 text-white mb-2 shadow-sm"><span>${r.avatar || '🤖'} <b>${r.name}</b></span><span class="text-indigo-400 font-black">${r.score} Hamle</span></div>`;
-                });
+            db.ref('users/' + n).once('value', s => {
+                const data = s.val();
+                if(type === 'login') {
+                    if(data && data.pass === p) { user = { ...data, name: n }; loginSuccess(); }
+                    else { alert("Hata! Kullanıcı bulunamadı veya şifre yanlış."); }
+                } else {
+                    if(data) { alert("Bu isim zaten alınmış!"); }
+                    else {
+                        const newUser = { name: n, pass: p, avatar: user.avatar, wins: 0, bestScore: 999 };
+                        db.ref('users/' + n).set(newUser).then(() => {
+                            user = newUser;
+                            alert("Kayıt Başarılı!");
+                            loginSuccess();
+                        });
+                    }
+                }
             });
         }
 
-        // 🛡️ GİRİŞ KONTROLÜ
+        function loginSuccess() {
+            localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass}));
+            document.getElementById('authModal').classList.add('hide');
+            document.getElementById('topUser').innerText = `${user.avatar} ${user.name}`;
+        }
+
+        function logout() { localStorage.removeItem('tahmat_user'); location.reload(); }
+
+        // 🎮 OYUN MANTIĞI
         function validateInput(el) {
             el.value = el.value.replace(/[^0-9]/g, '');
             const val = el.value;
@@ -227,19 +235,15 @@
             else { error.style.opacity = "0"; el.classList.remove('text-red-500'); }
         }
 
-        // 🎮 OYUN MANTIĞI
         function startGame() {
-            let ns = [0,1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5); if(ns[0] === 0) ns.push(ns.shift());
+            let ns = [0,1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5); 
+            if(ns[0] === 0) ns.push(ns.shift());
             config.target = ns.slice(0, config.digits).join('');
             config.attempts = 0; config.currentPlayer = 1;
             showScreen('gameScreen');
             document.getElementById('history').innerHTML = '';
             updateGameUI();
-            if(config.isTimeMode) { 
-                config.timeLeft = config.digits * 25; 
-                document.getElementById('timerDisplay').classList.remove('hide'); 
-                startTimer(); 
-            }
+            if(config.isTimeMode) { config.timeLeft = config.digits * 25; document.getElementById('timerDisplay').classList.remove('hide'); startTimer(); }
         }
 
         function makeGuess() {
@@ -250,7 +254,7 @@
             val.split('').forEach((n, i) => { if(n === config.target[i]) p++; else if(config.target.includes(n)) m++; });
             const c = config.playerColors[config.currentPlayer - 1];
             const row = document.createElement('div');
-            row.className = 'card-dark p-4 flex justify-between items-center mb-2 text-white border-r-8';
+            row.className = 'card-dark p-4 flex justify-between items-center mb-2 border-r-8';
             row.style.borderColor = c;
             row.innerHTML = `<p class="font-bold tracking-widest text-xl">${val}</p><div class="flex gap-4 font-black"><span class="text-green-500">+${p}</span><span class="text-red-500">-${m}</span></div>`;
             document.getElementById('history').prepend(row);
@@ -259,7 +263,7 @@
                 clearInterval(config.timerInterval); confetti({ particleCount: 200, spread: 70 });
                 if(config.totalPlayers === 1) {
                     user.wins = (user.wins || 0) + 1;
-                    if(config.attempts < (user.bestScore || Infinity)) user.bestScore = config.attempts;
+                    if(config.attempts < (user.bestScore || 999)) user.bestScore = config.attempts;
                     db.ref('users/' + user.name).update({ wins: user.wins, bestScore: user.bestScore });
                 }
                 db.ref('rekorlar').push({ name: user.name, avatar: user.avatar, score: config.attempts, digits: config.digits });
@@ -267,7 +271,7 @@
             } else { config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1; updateGameUI(); }
         }
 
-        // --- DİĞER YARDIMCI FONKSİYONLAR ---
+        // --- YARDIMCI ---
         function updateGameUI() {
             const c = config.playerColors[config.currentPlayer - 1];
             document.getElementById('curAv').innerText = config.totalPlayers > 1 ? '👤' : user.avatar;
@@ -276,18 +280,29 @@
             document.getElementById('playerBar').style.borderColor = c;
             document.getElementById('guessInput').placeholder = ".".repeat(config.digits);
         }
-
-        window.onload = () => { const saved = localStorage.getItem('tahmat_user'); if(saved) { const parsed = JSON.parse(saved); loadUserData(parsed.name, parsed.pass, 'login'); } };
-        function handleAuth(type) { const n = document.getElementById('authName').value.trim().toLowerCase(); const p = document.getElementById('authPass').value.trim(); if(n.length < 2 || p.length < 3) return alert("İsim min 2, Şifre min 3!"); loadUserData(n, p, type); }
-        function loadUserData(n, p, type) { db.ref('users/' + n).once('value', s => { const data = s.val(); if(type === 'login') { if(data && data.pass === p) { user = { ...data, name: n }; loginSuccess(); } else { alert("Hata!"); } } else { if(data) { alert("İsim alınmış!"); } else { user = { name: n, pass: p, avatar: user.avatar, wins: 0, bestScore: Infinity }; db.ref('users/' + n).set(user); loginSuccess(); } } }); }
-        function loginSuccess() { localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass})); document.getElementById('authModal').classList.add('hide'); document.getElementById('topUser').innerText = `${user.avatar} ${user.name}`; }
-        function logout() { localStorage.removeItem('tahmat_user'); location.reload(); }
+        function updateProfileUI() {
+            document.getElementById('profAv').innerText = user.avatar;
+            document.getElementById('profName').innerText = user.name;
+            document.getElementById('profWins').innerText = user.wins || 0;
+            document.getElementById('profBest').innerText = (user.bestScore === 999 || user.bestScore === Infinity) ? '--' : user.bestScore + " Hamle";
+        }
+        function loadLeaderboard() {
+            db.ref('rekorlar').limitToLast(15).once('value', s => {
+                const list = document.getElementById('leaderList'); list.innerHTML = '';
+                let res = []; s.forEach(c => res.push(c.val()));
+                res.sort((a,b) => a.score - b.score).forEach(r => {
+                    list.innerHTML += `<div class="flex justify-between p-4 bg-slate-800/60 rounded-2xl border border-slate-700 text-white mb-2 shadow-sm"><span>${r.avatar || '🤖'} <b>${r.name}</b></span><span class="text-indigo-400 font-black">${r.score} Hamle</span></div>`;
+                });
+            });
+        }
+        function pickAv(av, el) { user.avatar = av; document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected')); el.classList.add('avatar-selected'); }
         function setTimeMode(v) { config.isTimeMode = v; document.getElementById('modeNormal').classList.toggle('btn-active-blue', !v); document.getElementById('modeTime').classList.toggle('btn-active-red', v); }
         function setPlayers(n) { config.totalPlayers = n; document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue')); document.getElementById('p'+n).classList.add('btn-active-blue'); }
-        function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); document.getElementById('guessInput').maxLength = n; }
-        function pickAv(av, el) { user.avatar = av; document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected')); el.classList.add('avatar-selected'); }
+        function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); }
         function startTimer() { clearInterval(config.timerInterval); config.timerInterval = setInterval(() => { config.timeLeft--; document.getElementById('timerDisplay').innerText = config.timeLeft; if(config.timeLeft <= 0) { clearInterval(config.timerInterval); alert("Süre Bitti!"); backToMenu(); } }, 1000); }
         function backToMenu() { clearInterval(config.timerInterval); document.getElementById('timerDisplay').classList.add('hide'); closeAllScreens(); }
+        window.onload = () => { const saved = localStorage.getItem('tahmat_user'); if(saved) { const parsed = JSON.parse(saved); loadUserData(parsed.name, parsed.pass, 'login'); } };
+        function loadUserData(n, p, type) { db.ref('users/' + n).once('value', s => { const data = s.val(); if(data && data.pass === p) { user = { ...data, name: n }; loginSuccess(); } }); }
     </script>
 </body>
 </html>
