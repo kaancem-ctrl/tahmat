@@ -11,21 +11,21 @@
      <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
      <style>
-         :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #ffffff; --border-color: #334155; --input-text: #ffffff; }
-         .light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --border-color: #cbd5e1; --input-text: #1e293b; }
-         body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
-         .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; color: var(--text-main); }
-         .btn-opt { background-color: #334155; color: white; border: none; }
-         .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); color: white; }
-         .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); color: white; }
-         .btn-active-red { background-color: #ef4444 !important; transform: scale(1.05); color: white; }
-         .btn-active-amber { background-color: #f59e0b !important; transform: scale(1.05); color: white; }
-         .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); color: white; cursor: pointer; }
-         .hide { display: none !important; }
-         #guessInput { color: var(--input-text); }
-         #authModal { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); }
-         .avatar-choice { font-size: 2rem; cursor: pointer; padding: 10px; border-radius: 1rem; border: 2px solid transparent; }
-         .avatar-selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.2); }
+          :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #ffffff; --border-color: #334155; --input-text: #ffffff; }
+          .light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --border-color: #cbd5e1; --input-text: #1e293b; }
+          body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
+          .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; color: var(--text-main); }
+          .btn-opt { background-color: #334155; color: white; border: none; }
+          .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); color: white; }
+          .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); color: white; }
+          .btn-active-red { background-color: #ef4444 !important; transform: scale(1.05); color: white; }
+          .btn-active-amber { background-color: #f59e0b !important; transform: scale(1.05); color: white; }
+          .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); color: white; cursor: pointer; }
+          .hide { display: none !important; }
+          #guessInput { color: var(--input-text); }
+          #authModal { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); }
+          .avatar-choice { font-size: 2rem; cursor: pointer; padding: 10px; border-radius: 1rem; border: 2px solid transparent; }
+          .avatar-selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.2); }
      </style>
 </head>
 <body class="p-4 flex flex-col items-center">
@@ -37,12 +37,7 @@
                 <input type="text" id="authName" placeholder="Kullanıcı Adı" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
                 <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
             </div>
-            <div id="avatarBox" class="flex justify-center gap-2 flex-wrap">
-                <div onclick="pickAv('🤖', this)" class="avatar-choice avatar-selected">🤖</div>
-                <div onclick="pickAv('🦊', this)" class="avatar-choice">🦊</div>
-                <div onclick="pickAv('🚀', this)" class="avatar-choice">🚀</div>
-                <div onclick="pickAv('🐲', this)" class="avatar-choice">🐲</div>
-            </div>
+            <div id="avatarBox" class="flex justify-center gap-2 flex-wrap"></div>
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="handleAuth('login')" class="bg-indigo-600 py-4 rounded-2xl font-black uppercase text-xs" data-lang="loginBtn">Giriş Yap</button>
                 <button onclick="handleAuth('register')" class="bg-emerald-600 py-4 rounded-2xl font-black uppercase text-xs" data-lang="regBtn">Kayıt Ol</button>
@@ -254,10 +249,21 @@
             const list = document.getElementById('storeList'); list.innerHTML = '';
             storeItems.forEach(item => {
                 const isOwned = user.inventory.includes(item.id);
+                const isCurrent = user.avatar === item.id;
+                
+                let btnHtml = "";
+                if (isCurrent) {
+                    btnHtml = `<button class="bg-green-600 text-white px-4 py-1 rounded-lg text-[10px] font-black uppercase cursor-default">AKTİF</button>`;
+                } else if (isOwned) {
+                    btnHtml = `<button onclick="useAvatar('${item.id}')" class="bg-indigo-500 text-white px-4 py-1 rounded-lg text-[10px] font-black uppercase">KULLAN</button>`;
+                } else {
+                    btnHtml = `<button onclick="buyAvatar('${item.id}', ${item.price})" class="bg-amber-500 text-slate-900 px-4 py-1 rounded-lg text-[10px] font-black uppercase">${item.price} 🪙 AL</button>`;
+                }
+
                 list.innerHTML += `
-                    <div class="card-dark p-4 flex flex-col items-center border-2 ${isOwned ? 'border-green-500 opacity-60' : 'border-slate-700'}">
+                    <div class="card-dark p-4 flex flex-col items-center border-2 ${isOwned ? 'border-indigo-500' : 'border-slate-700'}">
                         <span class="text-4xl mb-2">${item.id}</span>
-                        ${isOwned ? `<button class="text-[10px] font-black text-green-500 uppercase">SAHİPSİN</button>` : `<button onclick="buyAvatar('${item.id}', ${item.price})" class="bg-amber-500 text-slate-900 px-4 py-1 rounded-lg text-[10px] font-black uppercase">${item.price} 🪙 AL</button>`}
+                        ${btnHtml}
                     </div>`;
             });
         }
@@ -268,6 +274,13 @@
                 db.ref('users/' + user.name).update({ coins: user.coins, inventory: user.inventory });
                 alert("Yeni avatar alındı!"); updateTopBar(); showStore();
             } else { alert("Yeterli Coin yok!"); }
+        }
+
+        function useAvatar(id) {
+            user.avatar = id;
+            db.ref('users/' + user.name).update({ avatar: id });
+            updateTopBar();
+            showStore();
         }
 
         function showLeaderboard() { showScreen('leaderboardScreen'); loadLeaderboard('normal'); }
