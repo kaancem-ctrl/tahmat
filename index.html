@@ -3,7 +3,7 @@
 <head>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>TahMat Pro Store Edition</title>
+     <title>TahMat Pro - Social Edition</title>
      <script src="https://cdn.tailwindcss.com"></script>
      <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
      <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -31,7 +31,7 @@
 <body class="p-4 flex flex-col items-center">
 
     <div id="authModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="card-dark w-full max-w-sm p-8 space-y-6 text-center border-2 border-indigo-500 shadow-2xl">
+        <div class="card-dark w-full max-sm p-8 space-y-6 text-center border-2 border-indigo-500 shadow-2xl">
             <h2 class="text-2xl font-black text-indigo-400 uppercase" data-lang="authTitle">TAHMAT GİRİŞ</h2>
             <div class="space-y-3">
                 <input type="text" id="authName" placeholder="Kullanıcı Adı" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
@@ -61,10 +61,7 @@
         <div class="flex gap-2 text-xs font-bold">
             <div class="flex items-center bg-slate-800 px-3 rounded-xl border border-amber-500 text-amber-500"><span id="userCoins">0</span> 🪙</div>
             <button id="themeBtn" onclick="toggleTheme()" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🌙</button>
-            <button onclick="downloadGame()" class="w-10 h-10 card-dark flex items-center justify-center text-lg" title="İndir">📥</button>
-            <button onclick="showAwards()" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🏅</button>
             <button onclick="showLeaderboard()" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🏆</button>
-            <button onclick="logout()" class="w-10 h-10 card-dark flex items-center justify-center text-[10px] text-red-500 font-bold uppercase" data-lang="logout">KAPAT</button>
         </div>
     </header>
 
@@ -86,17 +83,17 @@
             </div>
         </div>
 
-        <div class="card-dark p-6 text-center" id="playerSelect">
+        <div id="playerSelect" class="card-dark p-6 text-center">
             <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="playerLabel">Oyuncu Sayısı</h3>
             <div class="grid grid-cols-4 gap-2">
-                <button onclick="setPlayers(1)" id="p1" class="btn-opt py-3 rounded-xl font-bold btn-active-blue transition">1</button>
-                <button onclick="setPlayers(2)" id="p2" class="btn-opt py-3 rounded-xl font-bold transition">2</button>
-                <button onclick="setPlayers(3)" id="p3" class="btn-opt py-3 rounded-xl font-bold transition">3</button>
-                <button onclick="setPlayers(4)" id="p4" class="btn-opt py-3 rounded-xl font-bold transition">4</button>
+                <button onclick="setPlayers(1)" id="p1" class="btn-opt py-3 rounded-xl font-bold btn-active-blue">1</button>
+                <button onclick="setPlayers(2)" id="p2" class="btn-opt py-3 rounded-xl font-bold">2</button>
+                <button onclick="setPlayers(3)" id="p3" class="btn-opt py-3 rounded-xl font-bold">3</button>
+                <button onclick="setPlayers(4)" id="p4" class="btn-opt py-3 rounded-xl font-bold">4</button>
             </div>
         </div>
 
-        <div class="card-dark p-6 text-center" id="digitSelect">
+        <div class="card-dark p-6 text-center">
             <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="digitLabel">Basamak Sayısı</h3>
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="setDigits(3)" id="d3" class="btn-opt py-3 rounded-xl font-bold transition">3</button>
@@ -119,47 +116,61 @@
             </div>
         </div>
         <div class="card-dark p-8 text-center shadow-lg">
-            <p id="errorMsg" class="text-red-500 text-[10px] font-bold mb-2 uppercase opacity-0 transition" data-lang="errDiff">Rakamlar farklı olmalı!</p>
+            <p id="errorMsg" class="text-red-500 text-[10px] font-bold mb-2 uppercase opacity-0" data-lang="errDiff">Rakamlar farklı olmalı!</p>
             <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-6" placeholder="....">
             <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl uppercase shadow-lg" data-lang="guessBtn">Tahmin Et</button>
         </div>
         <div id="history" class="space-y-2 overflow-y-auto max-h-[250px] pr-2"></div>
     </div>
 
-    <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
-        <h2 class="text-xl font-black text-indigo-400 uppercase" data-lang="leaderTitle">🏆 REKORLAR</h2>
-        <div class="flex gap-2 justify-center mb-4">
-            <button onclick="loadLeaderboard('normal')" id="btnNormalTab" class="bg-indigo-600 text-[10px] px-4 py-2 rounded-lg font-bold">STANDART</button>
-            <button onclick="loadLeaderboard('daily')" id="btnDailyTab" class="bg-slate-700 text-[10px] px-4 py-2 rounded-lg font-bold">GÜNLÜK</button>
-        </div>
-        <div id="leaderList" class="space-y-2 max-h-[300px] overflow-y-auto pr-2"></div>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 rounded-2xl font-bold">GERİ DÖN</button>
-    </div>
-
-    <div id="awardsScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
-        <h2 class="text-xl font-black text-indigo-400 uppercase">🏅 BAŞARIMLAR</h2>
-        <div id="awardsList" class="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 rounded-2xl font-bold">GERİ DÖN</button>
-    </div>
-
     <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
         <div id="profAv" class="text-7xl mx-auto w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center border-2 border-indigo-500">🤖</div>
         <h2 id="profName" class="text-2xl font-black text-indigo-400">...</h2>
         <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-800 p-4 rounded-2xl"><p class="text-[10px] uppercase text-slate-500">Galibiyet</p><span id="profWins" class="text-2xl font-black text-green-400">0</span></div>
+            <div class="bg-slate-800 p-4 rounded-2xl"><p class="text-[10px] uppercase text-slate-500" data-lang="totalWins">Galibiyet</p><span id="profWins" class="text-2xl font-black text-green-400">0</span></div>
             <div class="bg-slate-800 p-4 rounded-2xl"><p class="text-[10px] uppercase text-slate-500">TahMat Coin</p><span id="profCoins" class="text-2xl font-black text-amber-500">0</span></div>
         </div>
-        <button onclick="showStore()" class="w-full py-4 bg-amber-500 text-slate-900 rounded-2xl font-black uppercase">🛒 AVATAR MAĞAZASI</button>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase">GERİ</button>
+        
+        <div class="space-y-4">
+            <button onclick="showStore()" class="w-full py-4 bg-amber-500 text-slate-900 rounded-2xl font-black uppercase">🛒 MAĞAZA</button>
+            <button onclick="showFriends()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase">👥 ARKADAŞLAR</button>
+            <button onclick="downloadMyData()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase">📂 VERİLERİ İNDİR</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="closeAllScreens()" class="py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ</button>
+            <button onclick="logout()" class="py-4 bg-red-600 rounded-2xl font-bold uppercase text-white">ÇIKIŞ YAP</button>
+        </div>
+    </div>
+
+    <div id="friendsScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
+        <h2 class="text-xl font-black text-indigo-400 uppercase">👥 ARKADAŞLAR</h2>
+        <div class="flex gap-2">
+            <input type="text" id="friendName" placeholder="Kullanıcı Adı" class="flex-1 bg-slate-800 border border-slate-600 rounded-xl p-3 text-white text-sm outline-none">
+            <button onclick="addFriend()" class="bg-indigo-600 px-4 rounded-xl font-bold text-sm">+</button>
+        </div>
+        <div id="friendsList" class="space-y-2 max-h-[300px] overflow-y-auto"></div>
+        <button onclick="showScreen('profileScreen')" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ</button>
     </div>
 
     <div id="storeScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
         <h2 class="text-xl font-black text-amber-500 uppercase">🛒 MAĞAZA</h2>
         <div id="storeList" class="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
-        <button onclick="showScreen('profileScreen')" class="w-full py-4 bg-slate-700 rounded-2xl font-bold">GERİ</button>
+        <button onclick="showScreen('profileScreen')" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ</button>
+    </div>
+
+    <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
+        <h2 class="text-xl font-black text-indigo-400 uppercase" data-lang="leaderTitle">🏆 REKORLAR</h2>
+        <div class="flex gap-2 justify-center mb-4">
+            <button onclick="loadLeaderboard('normal')" id="btnNormalTab" class="bg-indigo-600 text-[10px] px-4 py-2 rounded-lg font-bold uppercase" data-lang="modeStandart">STANDART</button>
+            <button onclick="loadLeaderboard('daily')" id="btnDailyTab" class="bg-slate-700 text-[10px] px-4 py-2 rounded-lg font-bold uppercase" data-lang="modeDaily">GÜNLÜK</button>
+        </div>
+        <div id="leaderList" class="space-y-2 max-h-[300px] overflow-y-auto pr-2"></div>
+        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ DÖN</button>
     </div>
 
     <script>
+        // Firebase ve Değişkenler
         const firebaseConfig = { apiKey: "AIza...", databaseURL: "https://tahmat-ac714-default-rtdb.europe-west1.firebasedatabase.app", projectId: "tahmat-ac714", appId: "APP_ID" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -167,43 +178,44 @@
         let curLang = 'tr';
         let gameMode = 'normal';
         const translations = {
-            tr: { authTitle: "TAHMAT GİRİŞ", loginBtn: "Giriş Yap", regBtn: "Kayıt Ol", infoTitle: "⚠️ Bilgi", infoBody: '<span class="text-green-500 font-bold underline">(+) ARTI:</span> Doğru yer.<br><span class="text-red-500 font-bold underline">(-) EKSİ:</span> Yanlış yer.', modeLabel: "Oyun Modu", modeStandart: "STANDART", modeTimed: "SÜRELİ", modeDaily: "GÜNLÜK", playerLabel: "Oyuncu Sayısı", digitLabel: "Basamak Sayısı", startBtn: "Başlat", leaderTitle: "🏆 REKORLAR", turnLabel: "SIRA SENDE", exitBtn: "ÇIK", errDiff: "Rakamlar farklı olmalı!", guessBtn: "Tahmin Et", logout: "KAPAT", winMsg: "Tebrikler! {n} hamle.", timeUp: "Süre Bitti! Sayı: ", totalWins: "Toplam Galibiyet" },
-            en: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Right place.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Wrong place.', modeLabel: "Game Mode", modeStandart: "STANDARD", modeTimed: "TIMED", modeDaily: "DAILY", playerLabel: "Players", digitLabel: "Digits", startBtn: "Start", leaderTitle: "🏆 LEADERBOARD", turnLabel: "YOUR TURN", exitBtn: "EXIT", errDiff: "Unique digits only!", guessBtn: "Guess", logout: "CLOSE", winMsg: "Congrats! {n} moves.", timeUp: "Time's Up! No: ", totalWins: "Total Wins" },
-            de: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Richtig.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Falscher Ort.', modeLabel: "Modus", modeStandart: "STANDARD", modeTimed: "ZEIT", modeDaily: "TÄGLICH", playerLabel: "Spieler", digitLabel: "Ziffern", startBtn: "Start", leaderTitle: "🏆 BESTENLISTE", turnLabel: "DU BIST DRAN", exitBtn: "ENDE", errDiff: "Unikat!", guessBtn: "Raten", logout: "AUS", winMsg: "Super! {n} Züge.", timeUp: "Zeit Um! Zahl: ", totalWins: "Siege" }
+            tr: { authTitle: "TAHMAT GİRİŞ", loginBtn: "Giriş Yap", regBtn: "Kayıt Ol", infoTitle: "⚠️ Bilgi", infoBody: '<span class="text-green-500 font-bold underline">(+) ARTI:</span> Doğru yer.<br><span class="text-red-500 font-bold underline">(-) EKSİ:</span> Yanlış yer.', modeLabel: "Oyun Modu", modeStandart: "STANDART", modeTimed: "SÜRELİ", modeDaily: "GÜNLÜK", playerLabel: "Oyuncu Sayısı", digitLabel: "Basamak Sayısı", startBtn: "Başlat", leaderTitle: "🏆 REKORLAR", turnLabel: "SIRA SENDE", exitBtn: "ÇIK", errDiff: "Rakamlar farklı olmalı!", guessBtn: "Tahmin Et", winMsg: "Tebrikler! {n} hamle.", timeUp: "Süre Bitti! Sayı: ", totalWins: "Toplam Galibiyet", back: "GERİ" },
+            en: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Right place.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Wrong place.', modeLabel: "Game Mode", modeStandart: "STANDARD", modeTimed: "TIMED", modeDaily: "DAILY", playerLabel: "Players", digitLabel: "Digits", startBtn: "Start", leaderTitle: "🏆 LEADERBOARD", turnLabel: "YOUR TURN", exitBtn: "EXIT", errDiff: "Unique digits only!", guessBtn: "Guess", winMsg: "Congrats! {n} moves.", timeUp: "Time's Up! No: ", totalWins: "Wins", back: "BACK" },
+            de: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Richtig.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Falscher Ort.', modeLabel: "Modus", modeStandart: "STANDARD", modeTimed: "ZEIT", modeDaily: "TÄGLICH", playerLabel: "Spieler", digitLabel: "Ziffern", startBtn: "Start", leaderTitle: "🏆 BESTENLISTE", turnLabel: "DU BIST DRAN", exitBtn: "ENDE", errDiff: "Unikat!", guessBtn: "Raten", winMsg: "Super! {n} Züge.", timeUp: "Zeit Um! Zahl: ", totalWins: "Siege", back: "ZURÜCK" }
         };
 
-        let user = { name: '', avatar: '🤖', wins: 0, coins: 0, inventory: ['🤖', '🦊', '🚀', '🐲'] };
+        let user = { name: '', avatar: '🤖', wins: 0, coins: 0, inventory: ['🤖', '🦊', '🚀', '🐲'], friends: [] };
         const storeItems = [{ id: '🦁', price: 50 }, { id: '🐵', price: 75 }, { id: '🥷', price: 150 }, { id: '👑', price: 300 }, { id: '👾', price: 100 }, { id: '🦄', price: 200 }, { id: '👻', price: 120 }, { id: '💎', price: 500 }];
-
         let config = { totalPlayers: 1, currentPlayer: 1, digits: 4, target: '', attempts: 0, isTimeMode: false, timeLeft: 0, timerInterval: null, isDark: true, playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b'] };
 
-        function downloadGame() {
-            const html = document.documentElement.outerHTML;
-            const blob = new Blob([html], { type: 'text/html' });
+        // İNDİRME FONKSİYONU
+        function downloadMyData() {
+            const dataToSave = {
+                username: user.name,
+                stats: {
+                    wins: user.wins,
+                    coins: user.coins,
+                    avatar: user.avatar
+                },
+                inventory: user.inventory,
+                friends: user.friends,
+                downloadDate: new Date().toLocaleString()
+            };
+            
+            const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'TahMat_Pro.html';
+            a.href = url;
+            a.download = `TahMat_Verilerim_${user.name}.json`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        function setMode(m) {
-            gameMode = m;
-            document.querySelectorAll('[id^="mode"]').forEach(b => b.classList.remove('btn-active-blue', 'btn-active-red', 'btn-active-amber'));
-            if(m === 'normal') document.getElementById('modeNormal').classList.add('btn-active-blue');
-            if(m === 'timed') document.getElementById('modeTime').classList.add('btn-active-red');
-            if(m === 'daily') document.getElementById('modeDaily').classList.add('btn-active-amber');
-            document.getElementById('playerSelect').style.display = m === 'daily' ? 'none' : 'block';
-        }
-
-        function startTimer() { 
-            if (config.timerInterval) clearInterval(config.timerInterval);
-            document.getElementById('timerDisplay').innerText = config.timeLeft;
-            config.timerInterval = setInterval(() => { 
-                config.timeLeft--; 
-                document.getElementById('timerDisplay').innerText = config.timeLeft;
-                if (config.timeLeft <= 0) { clearInterval(config.timerInterval); alert(translations[curLang].timeUp + config.target); backToMenu(); }
-            }, 1000); 
-        }
+        // Oyun ve UI Mantığı (Önceki kodun aynısı korunmuştur)
+        function setMode(m) { gameMode = m; document.querySelectorAll('[id^="mode"]').forEach(b => b.classList.remove('btn-active-blue', 'btn-active-red', 'btn-active-amber')); if(m === 'normal') document.getElementById('modeNormal').classList.add('btn-active-blue'); if(m === 'timed') document.getElementById('modeTime').classList.add('btn-active-red'); if(m === 'daily') document.getElementById('modeDaily').classList.add('btn-active-amber'); document.getElementById('playerSelect').style.display = m === 'daily' ? 'none' : 'block'; }
+        function setPlayers(n) { config.totalPlayers = n; document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue')); document.getElementById('p'+n).classList.add('btn-active-blue'); }
+        function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); }
 
         function startGame() {
             if(gameMode === 'daily') {
@@ -222,6 +234,8 @@
             else { document.getElementById('timerDisplay').classList.add('hide'); if(config.timerInterval) clearInterval(config.timerInterval); }
         }
 
+        function startTimer() { if (config.timerInterval) clearInterval(config.timerInterval); config.timerInterval = setInterval(() => { config.timeLeft--; document.getElementById('timerDisplay').innerText = config.timeLeft; if (config.timeLeft <= 0) { clearInterval(config.timerInterval); alert(translations[curLang].timeUp + config.target); backToMenu(); }}, 1000); }
+
         function makeGuess() {
             const input = document.getElementById('guessInput'); const val = input.value;
             if(val.length != config.digits || new Set(val).size !== val.length) return;
@@ -232,106 +246,79 @@
             row.style.borderColor = config.playerColors[config.currentPlayer - 1];
             row.innerHTML = `<p class="font-bold tracking-widest text-xl">${val}</p><div class="flex gap-4 font-black"><span class="text-green-500">+${p}</span><span class="text-red-500">-${m}</span></div>`;
             document.getElementById('history').prepend(row); input.value = '';
-            if(val === config.target) {
-                clearInterval(config.timerInterval); confetti({ particleCount: 200, spread: 70 });
-                let earned = Math.max(10, (20 - config.attempts) * 5); 
-                user.coins += earned; user.wins++;
-                const path = gameMode === 'daily' ? 'daily_rekorlar' : 'rekorlar/' + config.digits;
-                db.ref(path).push({ name: user.name, avatar: user.avatar, score: config.attempts });
-                db.ref('users/' + user.name).update({ wins: user.wins, coins: user.coins });
-                updateTopBar();
-                setTimeout(() => { alert(`${translations[curLang].winMsg.replace('{n}', config.attempts)}\nKazandığın: ${earned} 🪙`); backToMenu(); }, 500);
-            } else { config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1; updateGameUI(); }
+            if(val === config.target) handleWin();
+            else { config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1; updateGameUI(); }
+        }
+
+        function handleWin() {
+            clearInterval(config.timerInterval); confetti({ particleCount: 200, spread: 70 });
+            let earned = Math.max(10, (20 - config.attempts) * 5); 
+            user.coins += earned; user.wins++;
+            const path = gameMode === 'daily' ? 'daily_rekorlar/' + user.name : 'rekorlar/' + config.digits + '/' + user.name;
+            db.ref(path).once('value', s => { if(!s.exists() || s.val().score > config.attempts) { db.ref(path).set({ name: user.name, avatar: user.avatar, score: config.attempts }); }});
+            db.ref('users/' + user.name).update({ wins: user.wins, coins: user.coins });
+            updateTopBar();
+            setTimeout(() => { alert(`${translations[curLang].winMsg.replace('{n}', config.attempts)}\nKazandığın: ${earned} 🪙`); backToMenu(); }, 500);
+        }
+
+        function showFriends() {
+            showScreen('friendsScreen'); const list = document.getElementById('friendsList'); list.innerHTML = 'Yükleniyor...';
+            if(!user.friends) user.friends = []; if(user.friends.length === 0) { list.innerHTML = '<p class="text-slate-500 text-sm">Henüz arkadaşın yok.</p>'; return; }
+            list.innerHTML = ''; user.friends.forEach(fName => { db.ref('users/' + fName).once('value', s => { if(s.exists()) { const f = s.val(); list.innerHTML += `<div class="card-dark p-3 flex justify-between items-center mb-2 border-l-4 border-indigo-500"><div class="text-left"><span class="text-lg">${f.avatar}</span> <span class="font-bold text-sm">${fName}</span></div><span class="text-[10px] bg-green-900 px-2 py-1 rounded-full font-black">${f.wins} GALİBİYET</span></div>`; }});});
+        }
+
+        function addFriend() {
+            const fName = document.getElementById('friendName').value.trim().toLowerCase();
+            if(!fName || fName === user.name) return; if(user.friends && user.friends.includes(fName)) { alert("Zaten arkadaşsınız!"); return; }
+            db.ref('users/' + fName).once('value', s => { if(s.exists()) { if(!user.friends) user.friends = []; user.friends.push(fName); db.ref('users/' + user.name).update({ friends: user.friends }); document.getElementById('friendName').value = ''; showFriends(); } else { alert("Kullanıcı bulunamadı!"); }});
         }
 
         function showStore() {
-            showScreen('storeScreen');
-            const list = document.getElementById('storeList'); list.innerHTML = '';
+            showScreen('storeScreen'); const list = document.getElementById('storeList'); list.innerHTML = '';
             storeItems.forEach(item => {
-                const isOwned = user.inventory.includes(item.id);
-                const isCurrent = user.avatar === item.id;
-                
-                let btnHtml = "";
-                if (isCurrent) {
-                    btnHtml = `<button class="bg-green-600 text-white px-4 py-1 rounded-lg text-[10px] font-black uppercase cursor-default">AKTİF</button>`;
-                } else if (isOwned) {
-                    btnHtml = `<button onclick="useAvatar('${item.id}')" class="bg-indigo-500 text-white px-4 py-1 rounded-lg text-[10px] font-black uppercase">KULLAN</button>`;
-                } else {
-                    btnHtml = `<button onclick="buyAvatar('${item.id}', ${item.price})" class="bg-amber-500 text-slate-900 px-4 py-1 rounded-lg text-[10px] font-black uppercase">${item.price} 🪙 AL</button>`;
-                }
-
-                list.innerHTML += `
-                    <div class="card-dark p-4 flex flex-col items-center border-2 ${isOwned ? 'border-indigo-500' : 'border-slate-700'}">
-                        <span class="text-4xl mb-2">${item.id}</span>
-                        ${btnHtml}
-                    </div>`;
+                const isOwned = user.inventory.includes(item.id), isCurrent = user.avatar === item.id;
+                let btn = isCurrent ? `<button class="bg-green-600 px-4 py-1 rounded-lg text-[10px] font-black uppercase">AKTİF</button>` : isOwned ? `<button onclick="useAvatar('${item.id}')" class="bg-indigo-500 px-4 py-1 rounded-lg text-[10px] font-black uppercase">KULLAN</button>` : `<button onclick="buyAvatar('${item.id}', ${item.price})" class="bg-amber-500 text-slate-900 px-4 py-1 rounded-lg text-[10px] font-black uppercase">${item.price} 🪙</button>`;
+                list.innerHTML += `<div class="card-dark p-4 flex flex-col items-center border-2 ${isOwned?'border-indigo-500':'border-slate-700'}"><span class="text-4xl mb-2">${item.id}</span>${btn}</div>`;
             });
         }
 
-        function buyAvatar(id, price) {
-            if(user.coins >= price) {
-                user.coins -= price; user.inventory.push(id);
-                db.ref('users/' + user.name).update({ coins: user.coins, inventory: user.inventory });
-                alert("Yeni avatar alındı!"); updateTopBar(); showStore();
-            } else { alert("Yeterli Coin yok!"); }
-        }
+        function useAvatar(id) { user.avatar = id; db.ref('users/' + user.name).update({ avatar: id }); updateTopBar(); showStore(); }
+        function buyAvatar(id, price) { if(user.coins >= price) { user.coins -= price; user.inventory.push(id); db.ref('users/' + user.name).update({ coins: user.coins, inventory: user.inventory }); showStore(); updateTopBar(); } else alert("Yeterli Coin yok!"); }
 
-        function useAvatar(id) {
-            user.avatar = id;
-            db.ref('users/' + user.name).update({ avatar: id });
-            updateTopBar();
-            showStore();
-        }
-
-        function showLeaderboard() { showScreen('leaderboardScreen'); loadLeaderboard('normal'); }
         function loadLeaderboard(type) {
-            const list = document.getElementById('leaderList');
-            const btnN = document.getElementById('btnNormalTab');
-            const btnD = document.getElementById('btnDailyTab');
-            list.innerHTML = 'Yükleniyor...';
-            if(type === 'normal') { btnN.className = 'bg-indigo-600 text-[10px] px-4 py-2 rounded-lg font-bold'; btnD.className = 'bg-slate-700 text-[10px] px-4 py-2 rounded-lg font-bold'; }
-            else { btnD.className = 'bg-amber-500 text-[10px] px-4 py-2 rounded-lg font-bold'; btnN.className = 'bg-slate-700 text-[10px] px-4 py-2 rounded-lg font-bold'; }
-            const path = type === 'daily' ? 'daily_rekorlar' : 'rekorlar/' + config.digits;
-            db.ref(path).orderByChild('score').limitToFirst(20).once('value', s => {
-                list.innerHTML = '';
-                if(!s.exists()) { list.innerHTML = 'Rekor yok.'; return; }
-                s.forEach(c => { const r = c.val(); list.innerHTML += `<div class="card-dark p-3 flex justify-between items-center mb-1 border-l-4 border-indigo-500"><span class="text-xs font-bold">${r.avatar} ${r.name}</span><span class="bg-indigo-900 px-3 py-1 rounded-full text-[10px] font-black">${r.score} Hamle</span></div>`; });
-            });
+            const list = document.getElementById('leaderList'); const path = type === 'daily' ? 'daily_rekorlar' : 'rekorlar/' + config.digits; list.innerHTML = '...';
+            db.ref(path).orderByChild('score').limitToFirst(20).once('value', s => { list.innerHTML = ''; if(!s.exists()) { list.innerHTML = 'Rekor yok.'; return; } s.forEach(c => { const r = c.val(); list.innerHTML += `<div class="card-dark p-3 flex justify-between items-center mb-1 border-l-4 border-indigo-500"><span class="text-xs font-bold">${r.avatar} ${r.name}</span><span class="bg-indigo-900 px-3 py-1 rounded-full text-[10px] font-black">${r.score} Hamle</span></div>`; }); });
         }
 
-        function showAwards() {
-            showScreen('awardsScreen');
-            const list = document.getElementById('awardsList'); list.innerHTML = '';
-            const awards = [{ min: 1, title: "Yeni Zihin", icon: "🌱" }, { min: 10, title: "Sayı Ustası", icon: "🥉" }, { min: 50, title: "Deha", icon: "🥈" }, { min: 100, title: "Efsane", icon: "🥇" }];
-            awards.forEach(a => {
-                const lock = user.wins < a.min;
-                list.innerHTML += `<div class="card-dark p-4 flex flex-col items-center ${lock ? 'opacity-30' : 'border-indigo-500'}"><span class="text-4xl mb-2">${lock ? '🔒' : a.icon}</span><span class="text-[10px] font-black uppercase">${a.title}</span></div>`;
-            });
-        }
-
-        function updateTopBar() {
-            document.getElementById('userCoins').innerText = user.coins;
-            document.getElementById('profCoins').innerText = user.coins;
-            document.getElementById('profWins').innerText = user.wins;
-            document.getElementById('topUser').innerText = `${user.avatar} ${user.name}`;
-            document.getElementById('profAv').innerText = user.avatar;
-            document.getElementById('profName').innerText = user.name;
-        }
-
-        function setLang(l) { curLang = l; document.querySelectorAll('[data-lang]').forEach(el => el.innerHTML = translations[l][el.getAttribute('data-lang')] || el.innerHTML); document.getElementById('infoText').innerHTML = translations[l].infoBody; }
-        function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); document.getElementById('guessInput').placeholder = ".".repeat(n); }
-        function setPlayers(n) { config.totalPlayers = n; document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue')); document.getElementById('p'+n).classList.add('btn-active-blue'); }
+        function updateTopBar() { document.getElementById('userCoins').innerText = user.coins; document.getElementById('topUser').innerText = `${user.avatar} ${user.name}`; document.getElementById('profCoins').innerText = user.coins; document.getElementById('profWins').innerText = user.wins; document.getElementById('profAv').innerText = user.avatar; document.getElementById('profName').innerText = user.name; }
+        function setLang(l) { curLang = l; document.querySelectorAll('[data-lang]').forEach(el => el.innerHTML = translations[l][el.getAttribute('data-lang')] || el.innerHTML); document.getElementById('infoText').innerHTML = translations[l].infoBody; document.getElementById('guessInput').placeholder = ".".repeat(config.digits); }
         function toggleTheme() { config.isDark = !config.isDark; document.body.classList.toggle('light-theme'); document.getElementById('themeBtn').innerText = config.isDark ? "🌙" : "☀️"; }
         function showScreen(id) { document.querySelectorAll('main, div[id$="Screen"], #infoBanner').forEach(s => s.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
-        function closeAllScreens() { document.querySelectorAll('div[id$="Screen"]').forEach(s => s.classList.add('hide')); document.getElementById('mainScreen').classList.remove('hide'); document.getElementById('infoBanner').classList.remove('hide'); }
-        function updateGameUI() { const c = config.playerColors[config.currentPlayer-1]; document.getElementById('curAv').innerText = config.totalPlayers > 1 ? '👤' : user.avatar; document.getElementById('curName').innerText = config.totalPlayers > 1 ? `P${config.currentPlayer}` : user.name; document.getElementById('curName').style.color = c; document.getElementById('playerBar').style.borderColor = c; document.getElementById('guessInput').maxLength = config.digits; }
-        function handleAuth(type) { const n = document.getElementById('authName').value.trim().toLowerCase(); const p = document.getElementById('authPass').value.trim(); if(n.length < 2) return; db.ref('users/' + n).once('value', s => { if(type === 'login' && s.val()?.pass === p) { user = { ...user, ...s.val(), name: n }; loginSuccess(); } else if(type === 'register' && !s.exists()) { user = { ...user, name: n, pass: p }; db.ref('users/' + n).set(user).then(loginSuccess); }}); }
-        function loginSuccess() { localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass})); document.getElementById('authModal').classList.add('hide'); const box = document.getElementById('avatarBox'); box.innerHTML = ''; user.inventory.forEach(av => { box.innerHTML += `<div onclick="pickAv('${av}', this)" class="avatar-choice ${user.avatar === av ? 'avatar-selected' : ''}">${av}</div>`; }); updateTopBar(); setLang(curLang); }
-        function pickAv(av, el) { user.avatar = av; document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected')); el.classList.add('avatar-selected'); if(user.name) db.ref('users/' + user.name).update({ avatar: av }); updateTopBar(); }
-        function logout() { localStorage.removeItem('tahmat_user'); location.reload(); }
+        function closeAllScreens() { showScreen('mainScreen'); document.getElementById('infoBanner').classList.remove('hide'); }
+        function showLeaderboard() { showScreen('leaderboardScreen'); loadLeaderboard('normal'); }
         function backToMenu() { if(config.timerInterval) clearInterval(config.timerInterval); closeAllScreens(); }
-        function validateInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); const hasDup = new Set(el.value).size !== el.value.length; document.getElementById('errorMsg').style.opacity = hasDup ? "1" : "0"; }
-        window.onload = () => { setLang('tr'); setMode('normal'); const saved = localStorage.getItem('tahmat_user'); if(saved) { const p = JSON.parse(saved); db.ref('users/' + p.name).once('value', s => { if(s.val()?.pass === p.pass) { user = { ...user, ...s.val(), name: p.name }; loginSuccess(); }});} };
+        function logout() { localStorage.removeItem('tahmat_user'); location.reload(); }
+        function validateInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); const dup = new Set(el.value).size !== el.value.length; document.getElementById('errorMsg').style.opacity = dup ? "1" : "0"; }
+        
+        function handleAuth(type) { 
+            const n = document.getElementById('authName').value.trim().toLowerCase(), p = document.getElementById('authPass').value.trim();
+            if(n.length < 2) return;
+            db.ref('users/' + n).once('value', s => {
+                if(type === 'login' && s.val()?.pass === p) { user = { ...user, ...s.val(), name: n }; loginSuccess(); }
+                else if(type === 'register' && !s.exists()) { user = { ...user, name: n, pass: p, friends: [] }; db.ref('users/' + n).set(user).then(loginSuccess); }
+                else if(type === 'login') alert("Hatalı giriş!");
+            });
+        }
+
+        function loginSuccess() { localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass})); document.getElementById('authModal').classList.add('hide'); const box = document.getElementById('avatarBox'); box.innerHTML = ''; user.inventory.forEach(av => { box.innerHTML += `<div onclick="pickAv('${av}', this)" class="avatar-choice ${user.avatar===av?'avatar-selected':''}">${av}</div>`; }); updateTopBar(); setLang(curLang); }
+        function pickAv(av, el) { user.avatar = av; document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected')); el.classList.add('avatar-selected'); if(user.name) db.ref('users/' + user.name).update({ avatar: av }); updateTopBar(); }
+        function updateGameUI() { const isMulti = config.totalPlayers > 1; document.getElementById('curAv').innerText = isMulti ? '👤' : user.avatar; document.getElementById('curName').innerText = isMulti ? `Player ${config.currentPlayer}` : user.name; document.getElementById('curName').style.color = config.playerColors[config.currentPlayer-1]; document.getElementById('guessInput').maxLength = config.digits; }
+
+        window.onload = () => { 
+            setLang('tr'); setMode('normal'); setPlayers(1); setDigits(4);
+            const saved = localStorage.getItem('tahmat_user');
+            if(saved) { const p = JSON.parse(saved); db.ref('users/' + p.name).once('value', s => { if(s.val()?.pass === p.pass) { user = { ...user, ...s.val(), name: p.name }; loginSuccess(); }});}
+        };
     </script>
 </body>
 </html>
