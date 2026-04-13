@@ -1,323 +1,582 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>TahMat Pro - Social Edition</title>
-     <script src="https://cdn.tailwindcss.com"></script>
-     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TahMat Pro - Ultimate Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-     <style>
-          :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #ffffff; --border-color: #334155; --input-text: #ffffff; }
-          .light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --border-color: #cbd5e1; --input-text: #1e293b; }
-          body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
-          .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; color: var(--text-main); }
-          .btn-opt { background-color: #334155; color: white; border: none; }
-          .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); color: white; }
-          .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); color: white; }
-          .btn-active-red { background-color: #ef4444 !important; transform: scale(1.05); color: white; }
-          .btn-active-amber { background-color: #f59e0b !important; transform: scale(1.05); color: white; }
-          .btn-gradient { background: linear-gradient(90deg, #6366f1, #06b6d4); color: white; cursor: pointer; }
-          .hide { display: none !important; }
-          #guessInput { color: var(--input-text); }
-          #authModal { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); }
-          .avatar-choice { font-size: 2rem; cursor: pointer; padding: 10px; border-radius: 1rem; border: 2px solid transparent; }
-          .avatar-selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.2); }
-     </style>
+    <style>
+        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #ffffff; --border-color: #334155; --input-text: #ffffff; }
+        .light-theme { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --border-color: #cbd5e1; --input-text: #1e293b; }
+        body { font-family: 'Fredoka', sans-serif; background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; min-height: 100vh; overflow-x: hidden; }
+        .card-dark { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: 0.3s; color: var(--text-main); }
+        .btn-opt { background-color: #334155; color: white; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-opt:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .btn-active-blue { background-color: #6366f1 !important; transform: scale(1.05); color: white; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+        .btn-active-green { background-color: #22c55e !important; transform: scale(1.05); color: white; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+        .btn-active-red { background-color: #ef4444 !important; transform: scale(1.05); color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        .btn-active-amber { background-color: #f59e0b !important; transform: scale(1.05); color: white; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+        .btn-gradient { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; cursor: pointer; }
+        .btn-gradient:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .hide { display: none !important; }
+        .avatar-choice { font-size: 2.5rem; cursor: pointer; padding: 12px; border-radius: 1.2rem; border: 3px solid transparent; transition: 0.2s; }
+        .avatar-selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.2); transform: scale(1.1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
 </head>
 <body class="p-4 flex flex-col items-center">
 
-    <div id="authModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="card-dark w-full max-sm p-8 space-y-6 text-center border-2 border-indigo-500 shadow-2xl">
-            <h2 class="text-2xl font-black text-indigo-400 uppercase" data-lang="authTitle">TAHMAT GİRİŞ</h2>
+    <div id="authModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md">
+        <div class="card-dark w-full max-w-sm p-8 space-y-6 text-center border-2 border-indigo-500 shadow-2xl">
+            <h2 class="text-3xl font-black text-indigo-400 uppercase italic">TAHMAT PRO</h2>
             <div class="space-y-3">
-                <input type="text" id="authName" placeholder="Kullanıcı Adı" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
-                <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500">
+                <input type="text" id="authName" placeholder="Kullanıcı Adı" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500 text-center font-bold">
+                <input type="password" id="authPass" placeholder="Şifre" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-white outline-none focus:border-indigo-500 text-center font-bold">
             </div>
-            <div id="avatarBox" class="flex justify-center gap-2 flex-wrap"></div>
+            <p class="text-[10px] text-slate-500 font-bold">AVATAR SEÇ</p>
+            <div id="avatarBox" class="flex justify-center gap-2 flex-wrap bg-slate-900/50 p-3 rounded-2xl">
+                <span class="avatar-choice avatar-selected" onclick="selectAvatar('🤖', this)">🤖</span>
+                <span class="avatar-choice" onclick="selectAvatar('🦊', this)">🦊</span>
+                <span class="avatar-choice" onclick="selectAvatar('🚀', this)">🚀</span>
+                <span class="avatar-choice" onclick="selectAvatar('🐲', this)">🐲</span>
+            </div>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="handleAuth('login')" class="bg-indigo-600 py-4 rounded-2xl font-black uppercase text-xs" data-lang="loginBtn">Giriş Yap</button>
-                <button onclick="handleAuth('register')" class="bg-emerald-600 py-4 rounded-2xl font-black uppercase text-xs" data-lang="regBtn">Kayıt Ol</button>
+                <button onclick="handleAuth('login')" class="bg-indigo-600 py-4 rounded-2xl font-black uppercase text-sm hover:bg-indigo-500">Giriş Yap</button>
+                <button onclick="handleAuth('register')" class="bg-emerald-600 py-4 rounded-2xl font-black uppercase text-sm hover:bg-emerald-500">Kayıt Ol</button>
             </div>
         </div>
     </div>
 
-    <div id="infoBanner" class="w-full max-w-md p-4 rounded-2xl mb-6 text-center bg-slate-900/80 border-2 border-amber-500">
-        <h2 class="text-amber-500 font-black text-md mb-1 uppercase" data-lang="infoTitle">⚠️ Bilgi</h2>
-        <p class="text-xs text-white" id="infoText"></p>
+    <div id="infoBanner" class="w-full max-w-md p-4 rounded-2xl mb-6 text-center bg-slate-900/80 border-2 border-amber-500/50">
+        <h2 class="text-amber-500 font-black text-sm mb-1 uppercase tracking-widest" data-lang="infoTitle">⚠️ OYUN KURALLARI</h2>
+        <p class="text-[11px] text-slate-300 leading-relaxed" id="infoText"></p>
     </div>
 
-    <header class="w-full max-w-md flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
+    <header class="w-full max-w-md flex justify-between items-center border-b border-slate-700/50 pb-4 mb-6">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl text-white">T</div>
-            <div>
-                <h1 class="text-xl font-bold uppercase tracking-tight">TAHMAT</h1>
-                <button onclick="showScreen('profileScreen')" id="topUser" class="text-[10px] text-indigo-400 font-bold uppercase hover:underline cursor-pointer">...</button>
+            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg shadow-indigo-500/20">T</div>
+            <div onclick="showScreen('profileScreen')" class="cursor-pointer group">
+                <h1 class="text-xl font-black uppercase tracking-tighter group-hover:text-indigo-400 transition">TAHMAT PRO</h1>
+                <div id="topUser" class="text-[10px] text-indigo-400 font-bold uppercase flex items-center gap-1">...</div>
             </div>
         </div>
         <div class="flex gap-2 text-xs font-bold">
-            <div class="flex items-center bg-slate-800 px-3 rounded-xl border border-amber-500 text-amber-500"><span id="userCoins">0</span> 🪙</div>
-            <button id="themeBtn" onclick="toggleTheme()" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🌙</button>
-            <button onclick="showLeaderboard()" class="w-10 h-10 card-dark flex items-center justify-center text-lg">🏆</button>
+            <div class="flex items-center bg-slate-800 px-3 rounded-xl border border-amber-500/30 text-amber-500"><span id="userCoins">0</span>&nbsp;🪙</div>
+            <button id="themeBtn" onclick="toggleTheme()" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700">🌙</button>
+            <button onclick="showLeaderboard()" class="w-10 h-10 card-dark flex items-center justify-center text-lg hover:bg-slate-700">🏆</button>
         </div>
     </header>
 
     <main id="mainScreen" class="w-full max-w-md space-y-4">
-        <div class="card-dark p-4 text-center">
-            <div class="flex justify-center gap-4">
-                <button onclick="setLang('tr')" class="text-2xl hover:scale-110 transition">🇹🇷</button>
-                <button onclick="setLang('en')" class="text-2xl hover:scale-110 transition">🇺🇸</button>
-                <button onclick="setLang('de')" class="text-2xl hover:scale-110 transition">🇩🇪</button>
+        <div class="card-dark p-4 flex justify-around items-center bg-slate-800/30">
+            <button onclick="setLang('tr')" class="text-2xl hover:scale-125 transition grayscale hover:grayscale-0 focus:grayscale-0">🇹🇷</button>
+            <button onclick="setLang('en')" class="text-2xl hover:scale-125 transition grayscale hover:grayscale-0 focus:grayscale-0">🇺🇸</button>
+            <button onclick="setLang('de')" class="text-2xl hover:scale-125 transition grayscale hover:grayscale-0 focus:grayscale-0">🇩🇪</button>
+        </div>
+
+        <div class="card-dark p-6 text-center border-t-4 border-indigo-500">
+            <h3 class="text-[10px] font-black text-slate-500 mb-4 uppercase tracking-widest" data-lang="modeLabel">Oyun Modu Seçin</h3>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="setMode('normal')" id="modeNormal" class="btn-opt py-4 rounded-2xl font-black btn-active-blue text-[10px]" data-lang="modeStandart">KLASİK</button>
+                <button onclick="setMode('timed')" id="modeTime" class="btn-opt py-4 rounded-2xl font-black text-[10px]" data-lang="modeTimed">SÜRELİ</button>
+                <button onclick="setMode('daily')" id="modeDaily" class="btn-opt py-4 rounded-2xl font-black text-[10px]" data-lang="modeDaily">GÜNLÜK</button>
             </div>
         </div>
 
-        <div class="card-dark p-6 text-center">
-            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="modeLabel">Oyun Modu</h3>
-            <div class="grid grid-cols-3 gap-2">
-                <button onclick="setMode('normal')" id="modeNormal" class="btn-opt py-3 rounded-xl font-bold btn-active-blue text-[10px]" data-lang="modeStandart">STANDART</button>
-                <button onclick="setMode('timed')" id="modeTime" class="btn-opt py-3 rounded-xl font-bold text-[10px]" data-lang="modeTimed">SÜRELİ</button>
-                <button onclick="setMode('daily')" id="modeDaily" class="btn-opt py-3 rounded-xl font-bold text-[10px]" data-lang="modeDaily">GÜNLÜK</button>
-            </div>
-        </div>
-
-        <div id="playerSelect" class="card-dark p-6 text-center">
-            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="playerLabel">Oyuncu Sayısı</h3>
+        <div id="playerSelect" class="card-dark p-6 text-center border-t-4 border-emerald-500">
+            <h3 class="text-[10px] font-black text-slate-500 mb-4 uppercase tracking-widest" data-lang="playerLabel">Oyuncu Sayısı</h3>
             <div class="grid grid-cols-4 gap-2">
-                <button onclick="setPlayers(1)" id="p1" class="btn-opt py-3 rounded-xl font-bold btn-active-blue">1</button>
-                <button onclick="setPlayers(2)" id="p2" class="btn-opt py-3 rounded-xl font-bold">2</button>
-                <button onclick="setPlayers(3)" id="p3" class="btn-opt py-3 rounded-xl font-bold">3</button>
-                <button onclick="setPlayers(4)" id="p4" class="btn-opt py-3 rounded-xl font-bold">4</button>
+                <button onclick="setPlayers(1)" id="p1" class="btn-opt py-3 rounded-xl font-black btn-active-blue">1</button>
+                <button onclick="setPlayers(2)" id="p2" class="btn-opt py-3 rounded-xl font-black">2</button>
+                <button onclick="setPlayers(3)" id="p3" class="btn-opt py-3 rounded-xl font-black">3</button>
+                <button onclick="setPlayers(4)" id="p4" class="btn-opt py-3 rounded-xl font-black">4</button>
             </div>
         </div>
 
-        <div class="card-dark p-6 text-center">
-            <h3 class="text-[10px] font-bold text-slate-500 mb-4 uppercase" data-lang="digitLabel">Basamak Sayısı</h3>
-            <div class="grid grid-cols-3 gap-2">
-                <button onclick="setDigits(3)" id="d3" class="btn-opt py-3 rounded-xl font-bold transition">3</button>
-                <button onclick="setDigits(4)" id="d4" class="btn-opt py-3 rounded-xl font-bold btn-active-green transition">4</button>
-                <button onclick="setDigits(5)" id="d5" class="btn-opt py-3 rounded-xl font-bold transition">5</button>
+        <div class="card-dark p-6 text-center border-t-4 border-amber-500">
+            <h3 class="text-[10px] font-black text-slate-500 mb-4 uppercase tracking-widest" data-lang="digitLabel">Zorluk (Basamak)</h3>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="setDigits(3)" id="d3" class="btn-opt py-4 rounded-2xl font-black">3</button>
+                <button onclick="setDigits(4)" id="d4" class="btn-opt py-4 rounded-2xl font-black btn-active-green">4</button>
+                <button onclick="setDigits(5)" id="d5" class="btn-opt py-4 rounded-2xl font-black">5</button>
             </div>
         </div>
-        <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-black text-xl shadow-xl uppercase transition" data-lang="startBtn">Oyunu Başlat</button>
+
+        <button onclick="startGame()" class="btn-gradient w-full py-6 rounded-[2rem] font-black text-xl shadow-2xl uppercase tracking-wider" data-lang="startBtn">SAYIYI TAHMİN ET</button>
     </main>
 
     <div id="gameScreen" class="hide w-full max-w-md space-y-4">
-        <div id="playerBar" class="card-dark p-4 border-l-8 border-indigo-500 shadow-lg">
+        <div id="playerBar" class="card-dark p-5 border-l-8 border-indigo-600 shadow-xl bg-slate-900">
             <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div id="curAv" class="text-3xl">🤖</div>
-                    <div><p class="text-[10px] text-slate-500 font-bold uppercase" data-lang="turnLabel">SIRA SENDE</p><h2 id="curName" class="text-xl font-black text-indigo-400">...</h2></div>
+                <div class="flex items-center gap-4">
+                    <div id="curAv" class="text-4xl filter drop-shadow-md">🤖</div>
+                    <div>
+                        <p class="text-[10px] text-indigo-400 font-black uppercase" data-lang="turnLabel">SIRA SENDE</p>
+                        <h2 id="curName" class="text-2xl font-black tracking-tight">...</h2>
+                    </div>
                 </div>
-                <div id="timerDisplay" class="hide text-2xl font-black px-4 py-2 bg-slate-800 border-2 border-red-500 rounded-xl text-red-500">00</div>
-                <button onclick="backToMenu()" class="bg-slate-700 text-white text-[10px] px-3 py-2 rounded-xl font-bold uppercase" data-lang="exitBtn">ÇIK</button>
+                <div id="timerDisplay" class="hide text-2xl font-black px-5 py-2 bg-red-600/20 border-2 border-red-500 rounded-2xl text-red-500 animate-pulse">00</div>
+                <button onclick="backToMenu()" class="bg-slate-800 text-slate-400 text-[10px] px-4 py-2 rounded-xl font-black border border-slate-700 hover:text-white" data-lang="exitBtn">VAZGEÇ</button>
             </div>
         </div>
-        <div class="card-dark p-8 text-center shadow-lg">
-            <p id="errorMsg" class="text-red-500 text-[10px] font-bold mb-2 uppercase opacity-0" data-lang="errDiff">Rakamlar farklı olmalı!</p>
-            <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-6xl text-center font-bold tracking-[0.2em] outline-none border-b-4 border-indigo-500 pb-3 mb-6" placeholder="....">
-            <button onclick="makeGuess()" class="btn-gradient w-full py-5 rounded-2xl font-black text-xl uppercase shadow-lg" data-lang="guessBtn">Tahmin Et</button>
+
+        <div class="card-dark p-10 text-center relative overflow-hidden bg-slate-800/20">
+            <p id="errorMsg" class="text-red-500 text-[10px] font-black mb-2 uppercase opacity-0 transition">RAKAMLAR FARKLI OLMALI!</p>
+            <input type="text" id="guessInput" oninput="validateInput(this)" class="w-full bg-transparent text-7xl text-center font-black tracking-[0.3em] outline-none border-b-4 border-indigo-500 pb-4 mb-8 text-white" placeholder="....">
+            <button onclick="makeGuess()" class="btn-gradient w-full py-6 rounded-3xl font-black text-2xl uppercase shadow-xl" data-lang="guessBtn">GÖNDER</button>
         </div>
-        <div id="history" class="space-y-2 overflow-y-auto max-h-[250px] pr-2"></div>
+
+        <div id="history" class="space-y-3 overflow-y-auto max-h-[350px] px-1 pb-10"></div>
     </div>
 
-    <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
-        <div id="profAv" class="text-7xl mx-auto w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center border-2 border-indigo-500">🤖</div>
-        <h2 id="profName" class="text-2xl font-black text-indigo-400">...</h2>
+    <div id="profileScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center border-t-8 border-indigo-500">
+        <div class="relative inline-block">
+            <div id="profAv" class="text-8xl mx-auto w-32 h-32 bg-slate-800 rounded-[2.5rem] flex items-center justify-center border-4 border-indigo-500 shadow-2xl">🤖</div>
+            <div class="absolute -bottom-2 -right-2 bg-amber-500 text-slate-900 w-10 h-10 rounded-full flex items-center justify-center font-black border-4 border-slate-900">!</div>
+        </div>
+        <h2 id="profName" class="text-3xl font-black text-white tracking-tighter">KULLANICI</h2>
+        
         <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-800 p-4 rounded-2xl"><p class="text-[10px] uppercase text-slate-500" data-lang="totalWins">Galibiyet</p><span id="profWins" class="text-2xl font-black text-green-400">0</span></div>
-            <div class="bg-slate-800 p-4 rounded-2xl"><p class="text-[10px] uppercase text-slate-500">TahMat Coin</p><span id="profCoins" class="text-2xl font-black text-amber-500">0</span></div>
+            <div class="bg-slate-800/50 p-5 rounded-3xl border border-slate-700">
+                <p class="text-[10px] uppercase text-slate-500 font-black mb-1" data-lang="totalWins">TOPLAM ZAFER</p>
+                <span id="profWins" class="text-3xl font-black text-emerald-400">0</span>
+            </div>
+            <div class="bg-slate-800/50 p-5 rounded-3xl border border-slate-700">
+                <p class="text-[10px] uppercase text-slate-500 font-black mb-1">BAKİYE</p>
+                <span id="profCoins" class="text-3xl font-black text-amber-500">0</span>
+            </div>
         </div>
         
-        <div class="space-y-4">
-            <button onclick="showStore()" class="w-full py-4 bg-amber-500 text-slate-900 rounded-2xl font-black uppercase">🛒 MAĞAZA</button>
-            <button onclick="showFriends()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase">👥 ARKADAŞLAR</button>
-            <button onclick="downloadMyData()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase">📂 VERİLERİ İNDİR</button>
+        <div class="space-y-3">
+            <button onclick="showStore()" class="w-full py-5 bg-amber-500 text-slate-950 rounded-2xl font-black uppercase tracking-widest hover:bg-amber-400 transition">🛒 ÖZELLEŞTİRME MAĞAZASI</button>
+            <button onclick="showFriends()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-500 transition">👥 ARKADAŞ LİSTESİ</button>
+            <button onclick="downloadGameCode()" class="w-full py-5 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-500 transition">💾 OYUNU İNDİR (.HTML)</button>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="closeAllScreens()" class="py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ</button>
-            <button onclick="logout()" class="py-4 bg-red-600 rounded-2xl font-bold uppercase text-white">ÇIKIŞ YAP</button>
+        <div class="flex gap-4">
+            <button onclick="closeAllScreens()" class="flex-1 py-5 bg-slate-700 rounded-2xl font-black uppercase hover:bg-slate-600">GERİ</button>
+            <button onclick="logout()" class="flex-1 py-5 bg-red-600 rounded-2xl font-black uppercase text-white hover:bg-red-500">ÇIKIŞ</button>
         </div>
     </div>
 
-    <div id="friendsScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
-        <h2 class="text-xl font-black text-indigo-400 uppercase">👥 ARKADAŞLAR</h2>
+    <div id="friendsScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
+        <h2 class="text-2xl font-black text-indigo-400 uppercase tracking-tighter">👥 ARKADAŞLARIN</h2>
         <div class="flex gap-2">
-            <input type="text" id="friendName" placeholder="Kullanıcı Adı" class="flex-1 bg-slate-800 border border-slate-600 rounded-xl p-3 text-white text-sm outline-none">
-            <button onclick="addFriend()" class="bg-indigo-600 px-4 rounded-xl font-bold text-sm">+</button>
+            <input type="text" id="friendName" placeholder="Arkadaşının adı..." class="flex-1 bg-slate-800 border border-slate-600 rounded-2xl p-4 text-white text-sm outline-none focus:border-indigo-500">
+            <button onclick="addFriend()" class="bg-indigo-600 px-6 rounded-2xl font-black text-xl hover:bg-indigo-500">+</button>
         </div>
-        <div id="friendsList" class="space-y-2 max-h-[300px] overflow-y-auto"></div>
-        <button onclick="showScreen('profileScreen')" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ</button>
+        <div id="friendsList" class="space-y-3 max-h-[300px] overflow-y-auto pr-2"></div>
+        <button onclick="showScreen('profileScreen')" class="w-full py-5 bg-slate-700 rounded-2xl font-black uppercase">PROFİLE DÖN</button>
     </div>
 
-    <div id="storeScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
-        <h2 class="text-xl font-black text-amber-500 uppercase">🛒 MAĞAZA</h2>
+    <div id="storeScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
+        <h2 class="text-2xl font-black text-amber-500 uppercase tracking-tighter">🛒 MARKET</h2>
         <div id="storeList" class="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
-        <button onclick="showScreen('profileScreen')" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ</button>
+        <button onclick="showScreen('profileScreen')" class="w-full py-5 bg-slate-700 rounded-2xl font-black uppercase">PROFİLE DÖN</button>
     </div>
 
-    <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-6 space-y-4 text-center">
-        <h2 class="text-xl font-black text-indigo-400 uppercase" data-lang="leaderTitle">🏆 REKORLAR</h2>
-        <div class="flex gap-2 justify-center mb-4">
-            <button onclick="loadLeaderboard('normal')" id="btnNormalTab" class="bg-indigo-600 text-[10px] px-4 py-2 rounded-lg font-bold uppercase" data-lang="modeStandart">STANDART</button>
-            <button onclick="loadLeaderboard('daily')" id="btnDailyTab" class="bg-slate-700 text-[10px] px-4 py-2 rounded-lg font-bold uppercase" data-lang="modeDaily">GÜNLÜK</button>
-        </div>
-        <div id="leaderList" class="space-y-2 max-h-[300px] overflow-y-auto pr-2"></div>
-        <button onclick="closeAllScreens()" class="w-full py-4 bg-slate-700 rounded-2xl font-bold uppercase" data-lang="back">GERİ DÖN</button>
+    <div id="leaderboardScreen" class="hide w-full max-w-md card-dark p-8 space-y-6 text-center">
+        <h2 class="text-2xl font-black text-indigo-400 uppercase tracking-tighter">🏆 GLOBAL REKORLAR</h2>
+        <div id="leaderList" class="space-y-3 max-h-[400px] overflow-y-auto pr-2"></div>
+        <button onclick="closeAllScreens()" class="w-full py-5 bg-slate-700 rounded-2xl font-black uppercase">ANA MENÜ</button>
     </div>
 
     <script>
-        // Firebase ve Değişkenler
-        const firebaseConfig = { apiKey: "AIza...", databaseURL: "https://tahmat-ac714-default-rtdb.europe-west1.firebasedatabase.app", projectId: "tahmat-ac714", appId: "APP_ID" };
+        // FIREBASE BAĞLANTISI (Burayı kendi bilgilerinizle güncelleyebilirsiniz)
+        const firebaseConfig = { 
+            apiKey: "AIzaSyC...", 
+            databaseURL: "https://tahmat-ac714-default-rtdb.europe-west1.firebasedatabase.app", 
+            projectId: "tahmat-ac714", 
+            appId: "1:..." 
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // OYUN DURUMU VE VERİLER
         let curLang = 'tr';
         let gameMode = 'normal';
-        const translations = {
-            tr: { authTitle: "TAHMAT GİRİŞ", loginBtn: "Giriş Yap", regBtn: "Kayıt Ol", infoTitle: "⚠️ Bilgi", infoBody: '<span class="text-green-500 font-bold underline">(+) ARTI:</span> Doğru yer.<br><span class="text-red-500 font-bold underline">(-) EKSİ:</span> Yanlış yer.', modeLabel: "Oyun Modu", modeStandart: "STANDART", modeTimed: "SÜRELİ", modeDaily: "GÜNLÜK", playerLabel: "Oyuncu Sayısı", digitLabel: "Basamak Sayısı", startBtn: "Başlat", leaderTitle: "🏆 REKORLAR", turnLabel: "SIRA SENDE", exitBtn: "ÇIK", errDiff: "Rakamlar farklı olmalı!", guessBtn: "Tahmin Et", winMsg: "Tebrikler! {n} hamle.", timeUp: "Süre Bitti! Sayı: ", totalWins: "Toplam Galibiyet", back: "GERİ" },
-            en: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Right place.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Wrong place.', modeLabel: "Game Mode", modeStandart: "STANDARD", modeTimed: "TIMED", modeDaily: "DAILY", playerLabel: "Players", digitLabel: "Digits", startBtn: "Start", leaderTitle: "🏆 LEADERBOARD", turnLabel: "YOUR TURN", exitBtn: "EXIT", errDiff: "Unique digits only!", guessBtn: "Guess", winMsg: "Congrats! {n} moves.", timeUp: "Time's Up! No: ", totalWins: "Wins", back: "BACK" },
-            de: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ Info", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Richtig.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Falscher Ort.', modeLabel: "Modus", modeStandart: "STANDARD", modeTimed: "ZEIT", modeDaily: "TÄGLICH", playerLabel: "Spieler", digitLabel: "Ziffern", startBtn: "Start", leaderTitle: "🏆 BESTENLISTE", turnLabel: "DU BIST DRAN", exitBtn: "ENDE", errDiff: "Unikat!", guessBtn: "Raten", winMsg: "Super! {n} Züge.", timeUp: "Zeit Um! Zahl: ", totalWins: "Siege", back: "ZURÜCK" }
+        let selectedAvatar = '🤖';
+        let user = { 
+            name: '', 
+            avatar: '🤖', 
+            wins: 0, 
+            coins: 0, 
+            inventory: ['🤖'], 
+            friends: [], 
+            lastDaily: '' 
         };
 
-        let user = { name: '', avatar: '🤖', wins: 0, coins: 0, inventory: ['🤖', '🦊', '🚀', '🐲'], friends: [] };
-        const storeItems = [{ id: '🦁', price: 50 }, { id: '🐵', price: 75 }, { id: '🥷', price: 150 }, { id: '👑', price: 300 }, { id: '👾', price: 100 }, { id: '🦄', price: 200 }, { id: '👻', price: 120 }, { id: '💎', price: 500 }];
-        let config = { totalPlayers: 1, currentPlayer: 1, digits: 4, target: '', attempts: 0, isTimeMode: false, timeLeft: 0, timerInterval: null, isDark: true, playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b'] };
+        let config = { 
+            totalPlayers: 1, 
+            currentPlayer: 1, 
+            digits: 4, 
+            target: '', 
+            attempts: 0, 
+            isTimeMode: false, 
+            timeLeft: 0, 
+            timerInterval: null, 
+            isDark: true, 
+            playerColors: ['#6366f1', '#22c55e', '#ec4899', '#f59e0b'] 
+        };
+        
+        const translations = {
+            tr: { authTitle: "TAHMAT GİRİŞ", loginBtn: "Giriş Yap", regBtn: "Kayıt Ol", infoTitle: "⚠️ OYUN KURALLARI", infoBody: '<span class="text-green-500 font-bold underline">(+) ARTI:</span> Doğru rakam, doğru yer.<br><span class="text-red-500 font-bold underline">(-) EKSİ:</span> Doğru rakam, yanlış yer.', modeLabel: "Oyun Modu Seçin", modeStandart: "KLASİK", modeTimed: "SÜRELİ", modeDaily: "GÜNLÜK", playerLabel: "Oyuncu Sayısı", digitLabel: "Zorluk (Basamak)", startBtn: "SAYIYI TAHMİN ET", leaderTitle: "🏆 GLOBAL REKORLAR", turnLabel: "SIRA SENDE", exitBtn: "VAZGEÇ", errDiff: "RAKAMLAR FARKLI OLMALI!", guessBtn: "GÖNDER", winMsg: "Tebrikler! {n} hamlede bildin.", totalWins: "TOPLAM ZAFER", back: "GERİ" },
+            en: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ HOW TO PLAY", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Correct digit, right place.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Correct digit, wrong place.', modeLabel: "Select Game Mode", modeStandart: "CLASSIC", modeTimed: "TIMED", modeDaily: "DAILY", playerLabel: "Number of Players", digitLabel: "Difficulty (Digits)", startBtn: "GUESS THE NUMBER", leaderTitle: "🏆 GLOBAL RECORDS", turnLabel: "YOUR TURN", exitBtn: "ABORT", errDiff: "UNIQUE DIGITS ONLY!", guessBtn: "SEND", winMsg: "Bravo! Found in {n} moves.", totalWins: "TOTAL WINS", back: "BACK" },
+            de: { authTitle: "TAHMAT LOGIN", loginBtn: "Login", regBtn: "Register", infoTitle: "⚠️ REGELN", infoBody: '<span class="text-green-500 font-bold underline">(+) PLUS:</span> Richtige Zahl & Ort.<br><span class="text-red-500 font-bold underline">(-) MINUS:</span> Richtige Zahl, falscher Ort.', modeLabel: "Modus Wählen", modeStandart: "KLASSISCH", modeTimed: "ZEITMODUS", modeDaily: "TÄGLICH", playerLabel: "Spieleranzahl", digitLabel: "Schwierigkeit", startBtn: "ZAHL ERRATEN", leaderTitle: "🏆 REKORDE", turnLabel: "DU BIST DRAN", exitBtn: "ABBRUCH", errDiff: "NUR UNIKATE ZAHLEN!", guessBtn: "SENDEN", winMsg: "Glückwunsch! {n} Züge.", totalWins: "SIEGE", back: "ZURÜCK" }
+        };
 
-        // İNDİRME FONKSİYONU
-        function downloadMyData() {
-            const dataToSave = {
-                username: user.name,
-                stats: {
-                    wins: user.wins,
-                    coins: user.coins,
-                    avatar: user.avatar
-                },
-                inventory: user.inventory,
-                friends: user.friends,
-                downloadDate: new Date().toLocaleString()
-            };
+        const storeItems = [
+            { id: '🦁', price: 50 }, { id: '🐵', price: 100 }, { id: '🥷', price: 200 }, 
+            { id: '👑', price: 500 }, { id: '👽', price: 1000 }, { id: '👻', price: 1500 },
+            { id: '🦖', price: 2500 }, { id: '💎', price: 5000 }
+        ];
+
+        // GİRİŞ VE KAYIT İŞLEMLERİ
+        function selectAvatar(av, el) {
+            selectedAvatar = av;
+            document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected'));
+            el.classList.add('avatar-selected');
+        }
+
+        function handleAuth(type) { 
+            const n = document.getElementById('authName').value.trim().toLowerCase();
+            const p = document.getElementById('authPass').value.trim();
+            if(n.length < 3 || p.length < 3) { alert("Ad ve şifre en az 3 karakter olmalı!"); return; }
             
-            const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json' });
+            db.ref('users/' + n).once('value', s => {
+                if(type === 'login') {
+                    if(s.exists() && s.val().pass === p) {
+                        user = { ...user, ...s.val(), name: n };
+                        loginSuccess();
+                    } else { alert("Hatalı kullanıcı adı veya şifre!"); }
+                } else {
+                    if(!s.exists()) {
+                        user = { ...user, name: n, pass: p, avatar: selectedAvatar, inventory: [selectedAvatar] };
+                        db.ref('users/' + n).set(user).then(loginSuccess);
+                    } else { alert("Bu kullanıcı adı zaten alınmış!"); }
+                }
+            });
+        }
+
+        function loginSuccess() { 
+            localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass})); 
+            document.getElementById('authModal').classList.add('hide'); 
+            updateTopBar(); 
+            setLang(curLang); 
+        }
+
+        function logout() { 
+            localStorage.removeItem('tahmat_user'); 
+            location.reload(); 
+        }
+
+        // OYUN MANTIĞI
+        function startGame() {
+            const today = new Date().toISOString().slice(0, 10);
+
+            if(gameMode === 'daily') {
+                if(user.lastDaily === today) {
+                    alert("Bugünkü günlük mod hakkını zaten kullandın! Yarın yeni bir sayı için tekrar gel. 😉");
+                    return;
+                }
+                // Günlük sayı üretme (Tarihe bağlı sabit sayı)
+                const seedDate = today.replace(/-/g, '');
+                let seed = parseInt(seedDate) + config.digits;
+                const digits = []; const nums = [0,1,2,3,4,5,6,7,8,9];
+                for(let i=0; i<config.digits; i++) { 
+                    seed = (seed * 9301 + 49297) % 233280; 
+                    let idx = Math.floor((seed / 233280) * nums.length); 
+                    if(i===0 && nums[idx]===0) idx = (idx+1)%nums.length; 
+                    digits.push(nums.splice(idx,1)); 
+                }
+                config.target = digits.join(''); 
+                config.totalPlayers = 1; 
+                config.isTimeMode = false;
+            } else {
+                // Rastgele sayı üretme
+                let ns = [0,1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5); 
+                if(ns[0] === 0) ns.push(ns.shift());
+                config.target = ns.slice(0, config.digits).join(''); 
+                config.isTimeMode = (gameMode === 'timed');
+            }
+            
+            config.attempts = 0; 
+            config.currentPlayer = 1;
+            showScreen('gameScreen'); 
+            document.getElementById('history').innerHTML = ''; 
+            updateGameUI();
+
+            if(config.isTimeMode) { 
+                config.timeLeft = config.digits * 20; 
+                document.getElementById('timerDisplay').classList.remove('hide'); 
+                startTimer(); 
+            } else { 
+                document.getElementById('timerDisplay').classList.add('hide'); 
+                if(config.timerInterval) clearInterval(config.timerInterval); 
+            }
+        }
+
+        function startTimer() { 
+            if (config.timerInterval) clearInterval(config.timerInterval); 
+            config.timerInterval = setInterval(() => { 
+                config.timeLeft--; 
+                document.getElementById('timerDisplay').innerText = config.timeLeft; 
+                if (config.timeLeft <= 0) { 
+                    clearInterval(config.timerInterval); 
+                    alert("Süre doldu! Aranan sayı: " + config.target); 
+                    backToMenu(); 
+                }
+            }, 1000); 
+        }
+
+        function makeGuess() {
+            const input = document.getElementById('guessInput'); 
+            const val = input.value;
+            if(val.length != config.digits || new Set(val).size !== val.length) return;
+            
+            config.attempts++; 
+            let p=0, m=0;
+            val.split('').forEach((n, i) => { 
+                if(n === config.target[i]) p++; 
+                else if(config.target.includes(n)) m++; 
+            });
+
+            const row = document.createElement('div');
+            row.className = 'card-dark p-5 flex justify-between items-center mb-2 border-r-8 bg-slate-800/40 animate-slide-in';
+            row.style.borderColor = config.playerColors[config.currentPlayer - 1];
+            row.innerHTML = `
+                <div class="flex flex-col">
+                    <span class="text-[8px] text-slate-500 font-black uppercase">DENEME #${config.attempts}</span>
+                    <p class="font-black tracking-[0.3em] text-2xl text-white">${val}</p>
+                </div>
+                <div class="flex gap-4 font-black text-xl">
+                    <span class="text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-xl">+${p}</span>
+                    <span class="text-red-500 bg-red-500/10 px-3 py-1 rounded-xl">-${m}</span>
+                </div>`;
+            document.getElementById('history').prepend(row); 
+            input.value = '';
+
+            if(val === config.target) {
+                handleWin();
+            } else {
+                if(config.totalPlayers > 1) {
+                    config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1;
+                    updateGameUI();
+                }
+            }
+        }
+
+        function handleWin() {
+            clearInterval(config.timerInterval); 
+            confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
+            
+            let earned = Math.max(10, (25 - config.attempts) * (config.digits - 2) * 5); 
+            if(gameMode === 'timed') earned *= 2;
+            if(gameMode === 'daily') earned *= 3;
+
+            user.coins += earned; 
+            user.wins++;
+
+            const updates = { wins: user.wins, coins: user.coins };
+            if(gameMode === 'daily') { 
+                const today = new Date().toISOString().slice(0, 10);
+                user.lastDaily = today; 
+                updates.lastDaily = today; 
+            }
+
+            // Global rekorlar güncelleme
+            const path = gameMode === 'daily' ? 'daily_rekorlar/' + user.name : 'rekorlar/' + config.digits + '/' + user.name;
+            db.ref(path).once('value', s => {
+                if(!s.exists() || s.val().score > config.attempts) {
+                    db.ref(path).set({ name: user.name, avatar: user.avatar, score: config.attempts });
+                }
+            });
+
+            db.ref('users/' + user.name).update(updates);
+            updateTopBar();
+            
+            setTimeout(() => { 
+                alert(`${translations[curLang].winMsg.replace('{n}', config.attempts)}\nKazancın: ${earned} 🪙`); 
+                backToMenu(); 
+            }, 600);
+        }
+
+        // MAĞAZA VE ARKADAŞLAR
+        function showStore() {
+            showScreen('storeScreen');
+            const list = document.getElementById('storeList');
+            list.innerHTML = '';
+            storeItems.forEach(item => {
+                const owned = user.inventory.includes(item.id);
+                const div = document.createElement('div');
+                div.className = `card-dark p-4 flex flex-col items-center gap-2 ${owned ? 'opacity-50 border-emerald-500' : ''}`;
+                div.innerHTML = `
+                    <span class="text-5xl">${item.id}</span>
+                    <span class="text-xs font-black text-amber-500">${item.price} 🪙</span>
+                    <button onclick="${owned ? `useAvatar('${item.id}')` : `buyAvatar('${item.id}', ${item.price})`}" 
+                        class="w-full py-2 rounded-xl font-black text-[10px] ${owned ? 'bg-emerald-600' : 'bg-indigo-600'}">
+                        ${owned ? (user.avatar === item.id ? 'AKTİF' : 'SEÇ') : 'SATIN AL'}
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function buyAvatar(id, price) {
+            if(user.coins >= price) {
+                user.coins -= price;
+                user.inventory.push(id);
+                db.ref('users/' + user.name).update({ coins: user.coins, inventory: user.inventory });
+                updateTopBar();
+                showStore();
+            } else { alert("Yetersiz bakiye!"); }
+        }
+
+        function useAvatar(id) {
+            user.avatar = id;
+            db.ref('users/' + user.name).update({ avatar: id });
+            updateTopBar();
+            showStore();
+        }
+
+        function showFriends() {
+            showScreen('friendsScreen');
+            const list = document.getElementById('friendsList');
+            list.innerHTML = '';
+            (user.friends || []).forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'card-dark p-4 flex justify-between items-center bg-slate-800/50';
+                div.innerHTML = `<span class="font-black text-indigo-400">@${f}</span><button onclick="removeFriend('${f}')" class="text-red-500 font-bold text-xs">SİL</button>`;
+                list.appendChild(div);
+            });
+        }
+
+        function addFriend() {
+            const fName = document.getElementById('friendName').value.trim().toLowerCase();
+            if(!fName || fName === user.name) return;
+            db.ref('users/' + fName).once('value', s => {
+                if(s.exists()) {
+                    user.friends = user.friends || [];
+                    if(!user.friends.includes(fName)) {
+                        user.friends.push(fName);
+                        db.ref('users/' + user.name).update({ friends: user.friends });
+                        showFriends();
+                        document.getElementById('friendName').value = '';
+                    } else { alert("Zaten arkadaşsınız!"); }
+                } else { alert("Kullanıcı bulunamadı!"); }
+            });
+        }
+
+        function removeFriend(fName) {
+            user.friends = user.friends.filter(f => f !== fName);
+            db.ref('users/' + user.name).update({ friends: user.friends });
+            showFriends();
+        }
+
+        function showLeaderboard() {
+            showScreen('leaderboardScreen');
+            const list = document.getElementById('leaderList');
+            list.innerHTML = '<p class="text-slate-500 animate-pulse uppercase font-black">Yükleniyor...</p>';
+            
+            db.ref('rekorlar/' + config.digits).orderByChild('score').limitToFirst(10).once('value', s => {
+                list.innerHTML = '';
+                let rank = 1;
+                s.forEach(child => {
+                    const data = child.val();
+                    const div = document.createElement('div');
+                    div.className = `card-dark p-4 flex justify-between items-center ${data.name === user.name ? 'border-indigo-500 bg-indigo-500/10' : ''}`;
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg font-black text-slate-500">#${rank++}</span>
+                            <span class="text-2xl">${data.avatar || '🤖'}</span>
+                            <span class="font-black">${data.name}</span>
+                        </div>
+                        <span class="bg-slate-700 px-4 py-1 rounded-full font-black text-emerald-400">${data.score} Hamle</span>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        // SİSTEM FONKSİYONLARI
+        function downloadGameCode() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `TahMat_Verilerim_${user.name}.json`;
+            a.download = "TahMat_Pro_v2.html";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
-        // Oyun ve UI Mantığı (Önceki kodun aynısı korunmuştur)
-        function setMode(m) { gameMode = m; document.querySelectorAll('[id^="mode"]').forEach(b => b.classList.remove('btn-active-blue', 'btn-active-red', 'btn-active-amber')); if(m === 'normal') document.getElementById('modeNormal').classList.add('btn-active-blue'); if(m === 'timed') document.getElementById('modeTime').classList.add('btn-active-red'); if(m === 'daily') document.getElementById('modeDaily').classList.add('btn-active-amber'); document.getElementById('playerSelect').style.display = m === 'daily' ? 'none' : 'block'; }
+        function setMode(m) { 
+            gameMode = m; 
+            document.querySelectorAll('[id^="mode"]').forEach(b => b.classList.remove('btn-active-blue', 'btn-active-red', 'btn-active-amber')); 
+            if(m === 'normal') document.getElementById('modeNormal').classList.add('btn-active-blue'); 
+            if(m === 'timed') document.getElementById('modeTime').classList.add('btn-active-red'); 
+            if(m === 'daily') document.getElementById('modeDaily').classList.add('btn-active-amber'); 
+            document.getElementById('playerSelect').style.display = m === 'daily' ? 'none' : 'block'; 
+        }
+
         function setPlayers(n) { config.totalPlayers = n; document.querySelectorAll('[id^="p"]').forEach(b => b.classList.remove('btn-active-blue')); document.getElementById('p'+n).classList.add('btn-active-blue'); }
         function setDigits(n) { config.digits = n; document.querySelectorAll('[id^="d"]').forEach(b => b.classList.remove('btn-active-green')); document.getElementById('d'+n).classList.add('btn-active-green'); }
-
-        function startGame() {
-            if(gameMode === 'daily') {
-                const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-                let seed = parseInt(today) + config.digits;
-                const digits = []; const nums = [0,1,2,3,4,5,6,7,8,9];
-                for(let i=0; i<config.digits; i++) { seed = (seed * 9301 + 49297) % 233280; let idx = Math.floor((seed / 233280) * nums.length); if(i===0 && nums[idx]===0) idx = (idx+1)%nums.length; digits.push(nums.splice(idx,1)); }
-                config.target = digits.join(''); config.totalPlayers = 1; config.isTimeMode = false;
-            } else {
-                let ns = [0,1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5); if(ns[0] === 0) ns.push(ns.shift());
-                config.target = ns.slice(0, config.digits).join(''); config.isTimeMode = (gameMode === 'timed');
-            }
-            config.attempts = 0; config.currentPlayer = 1;
-            showScreen('gameScreen'); document.getElementById('history').innerHTML = ''; updateGameUI();
-            if(config.isTimeMode) { config.timeLeft = config.digits * 20; document.getElementById('timerDisplay').classList.remove('hide'); startTimer(); }
-            else { document.getElementById('timerDisplay').classList.add('hide'); if(config.timerInterval) clearInterval(config.timerInterval); }
-        }
-
-        function startTimer() { if (config.timerInterval) clearInterval(config.timerInterval); config.timerInterval = setInterval(() => { config.timeLeft--; document.getElementById('timerDisplay').innerText = config.timeLeft; if (config.timeLeft <= 0) { clearInterval(config.timerInterval); alert(translations[curLang].timeUp + config.target); backToMenu(); }}, 1000); }
-
-        function makeGuess() {
-            const input = document.getElementById('guessInput'); const val = input.value;
-            if(val.length != config.digits || new Set(val).size !== val.length) return;
-            config.attempts++; let p=0, m=0;
-            val.split('').forEach((n, i) => { if(n === config.target[i]) p++; else if(config.target.includes(n)) m++; });
-            const row = document.createElement('div');
-            row.className = 'card-dark p-4 flex justify-between items-center mb-2 border-r-8 bg-slate-800/40';
-            row.style.borderColor = config.playerColors[config.currentPlayer - 1];
-            row.innerHTML = `<p class="font-bold tracking-widest text-xl">${val}</p><div class="flex gap-4 font-black"><span class="text-green-500">+${p}</span><span class="text-red-500">-${m}</span></div>`;
-            document.getElementById('history').prepend(row); input.value = '';
-            if(val === config.target) handleWin();
-            else { config.currentPlayer = (config.currentPlayer % config.totalPlayers) + 1; updateGameUI(); }
-        }
-
-        function handleWin() {
-            clearInterval(config.timerInterval); confetti({ particleCount: 200, spread: 70 });
-            let earned = Math.max(10, (20 - config.attempts) * 5); 
-            user.coins += earned; user.wins++;
-            const path = gameMode === 'daily' ? 'daily_rekorlar/' + user.name : 'rekorlar/' + config.digits + '/' + user.name;
-            db.ref(path).once('value', s => { if(!s.exists() || s.val().score > config.attempts) { db.ref(path).set({ name: user.name, avatar: user.avatar, score: config.attempts }); }});
-            db.ref('users/' + user.name).update({ wins: user.wins, coins: user.coins });
-            updateTopBar();
-            setTimeout(() => { alert(`${translations[curLang].winMsg.replace('{n}', config.attempts)}\nKazandığın: ${earned} 🪙`); backToMenu(); }, 500);
-        }
-
-        function showFriends() {
-            showScreen('friendsScreen'); const list = document.getElementById('friendsList'); list.innerHTML = 'Yükleniyor...';
-            if(!user.friends) user.friends = []; if(user.friends.length === 0) { list.innerHTML = '<p class="text-slate-500 text-sm">Henüz arkadaşın yok.</p>'; return; }
-            list.innerHTML = ''; user.friends.forEach(fName => { db.ref('users/' + fName).once('value', s => { if(s.exists()) { const f = s.val(); list.innerHTML += `<div class="card-dark p-3 flex justify-between items-center mb-2 border-l-4 border-indigo-500"><div class="text-left"><span class="text-lg">${f.avatar}</span> <span class="font-bold text-sm">${fName}</span></div><span class="text-[10px] bg-green-900 px-2 py-1 rounded-full font-black">${f.wins} GALİBİYET</span></div>`; }});});
-        }
-
-        function addFriend() {
-            const fName = document.getElementById('friendName').value.trim().toLowerCase();
-            if(!fName || fName === user.name) return; if(user.friends && user.friends.includes(fName)) { alert("Zaten arkadaşsınız!"); return; }
-            db.ref('users/' + fName).once('value', s => { if(s.exists()) { if(!user.friends) user.friends = []; user.friends.push(fName); db.ref('users/' + user.name).update({ friends: user.friends }); document.getElementById('friendName').value = ''; showFriends(); } else { alert("Kullanıcı bulunamadı!"); }});
-        }
-
-        function showStore() {
-            showScreen('storeScreen'); const list = document.getElementById('storeList'); list.innerHTML = '';
-            storeItems.forEach(item => {
-                const isOwned = user.inventory.includes(item.id), isCurrent = user.avatar === item.id;
-                let btn = isCurrent ? `<button class="bg-green-600 px-4 py-1 rounded-lg text-[10px] font-black uppercase">AKTİF</button>` : isOwned ? `<button onclick="useAvatar('${item.id}')" class="bg-indigo-500 px-4 py-1 rounded-lg text-[10px] font-black uppercase">KULLAN</button>` : `<button onclick="buyAvatar('${item.id}', ${item.price})" class="bg-amber-500 text-slate-900 px-4 py-1 rounded-lg text-[10px] font-black uppercase">${item.price} 🪙</button>`;
-                list.innerHTML += `<div class="card-dark p-4 flex flex-col items-center border-2 ${isOwned?'border-indigo-500':'border-slate-700'}"><span class="text-4xl mb-2">${item.id}</span>${btn}</div>`;
-            });
-        }
-
-        function useAvatar(id) { user.avatar = id; db.ref('users/' + user.name).update({ avatar: id }); updateTopBar(); showStore(); }
-        function buyAvatar(id, price) { if(user.coins >= price) { user.coins -= price; user.inventory.push(id); db.ref('users/' + user.name).update({ coins: user.coins, inventory: user.inventory }); showStore(); updateTopBar(); } else alert("Yeterli Coin yok!"); }
-
-        function loadLeaderboard(type) {
-            const list = document.getElementById('leaderList'); const path = type === 'daily' ? 'daily_rekorlar' : 'rekorlar/' + config.digits; list.innerHTML = '...';
-            db.ref(path).orderByChild('score').limitToFirst(20).once('value', s => { list.innerHTML = ''; if(!s.exists()) { list.innerHTML = 'Rekor yok.'; return; } s.forEach(c => { const r = c.val(); list.innerHTML += `<div class="card-dark p-3 flex justify-between items-center mb-1 border-l-4 border-indigo-500"><span class="text-xs font-bold">${r.avatar} ${r.name}</span><span class="bg-indigo-900 px-3 py-1 rounded-full text-[10px] font-black">${r.score} Hamle</span></div>`; }); });
-        }
-
-        function updateTopBar() { document.getElementById('userCoins').innerText = user.coins; document.getElementById('topUser').innerText = `${user.avatar} ${user.name}`; document.getElementById('profCoins').innerText = user.coins; document.getElementById('profWins').innerText = user.wins; document.getElementById('profAv').innerText = user.avatar; document.getElementById('profName').innerText = user.name; }
-        function setLang(l) { curLang = l; document.querySelectorAll('[data-lang]').forEach(el => el.innerHTML = translations[l][el.getAttribute('data-lang')] || el.innerHTML); document.getElementById('infoText').innerHTML = translations[l].infoBody; document.getElementById('guessInput').placeholder = ".".repeat(config.digits); }
-        function toggleTheme() { config.isDark = !config.isDark; document.body.classList.toggle('light-theme'); document.getElementById('themeBtn').innerText = config.isDark ? "🌙" : "☀️"; }
         function showScreen(id) { document.querySelectorAll('main, div[id$="Screen"], #infoBanner').forEach(s => s.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
         function closeAllScreens() { showScreen('mainScreen'); document.getElementById('infoBanner').classList.remove('hide'); }
-        function showLeaderboard() { showScreen('leaderboardScreen'); loadLeaderboard('normal'); }
+        function updateTopBar() { document.getElementById('userCoins').innerText = user.coins; document.getElementById('topUser').innerHTML = `<span>${user.avatar}</span> <span>@${user.name}</span>`; document.getElementById('profCoins').innerText = user.coins; document.getElementById('profWins').innerText = user.wins; document.getElementById('profAv').innerText = user.avatar; document.getElementById('profName').innerText = user.name.toUpperCase(); }
         function backToMenu() { if(config.timerInterval) clearInterval(config.timerInterval); closeAllScreens(); }
-        function logout() { localStorage.removeItem('tahmat_user'); location.reload(); }
-        function validateInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); const dup = new Set(el.value).size !== el.value.length; document.getElementById('errorMsg').style.opacity = dup ? "1" : "0"; }
         
-        function handleAuth(type) { 
-            const n = document.getElementById('authName').value.trim().toLowerCase(), p = document.getElementById('authPass').value.trim();
-            if(n.length < 2) return;
-            db.ref('users/' + n).once('value', s => {
-                if(type === 'login' && s.val()?.pass === p) { user = { ...user, ...s.val(), name: n }; loginSuccess(); }
-                else if(type === 'register' && !s.exists()) { user = { ...user, name: n, pass: p, friends: [] }; db.ref('users/' + n).set(user).then(loginSuccess); }
-                else if(type === 'login') alert("Hatalı giriş!");
-            });
+        function validateInput(el) { 
+            el.value = el.value.replace(/[^0-9]/g, ''); 
+            if(el.value.length > config.digits) el.value = el.value.slice(0, config.digits);
+            const dup = new Set(el.value).size !== el.value.length; 
+            document.getElementById('errorMsg').style.opacity = dup ? "1" : "0"; 
         }
 
-        function loginSuccess() { localStorage.setItem('tahmat_user', JSON.stringify({name: user.name, pass: user.pass})); document.getElementById('authModal').classList.add('hide'); const box = document.getElementById('avatarBox'); box.innerHTML = ''; user.inventory.forEach(av => { box.innerHTML += `<div onclick="pickAv('${av}', this)" class="avatar-choice ${user.avatar===av?'avatar-selected':''}">${av}</div>`; }); updateTopBar(); setLang(curLang); }
-        function pickAv(av, el) { user.avatar = av; document.querySelectorAll('.avatar-choice').forEach(x => x.classList.remove('avatar-selected')); el.classList.add('avatar-selected'); if(user.name) db.ref('users/' + user.name).update({ avatar: av }); updateTopBar(); }
-        function updateGameUI() { const isMulti = config.totalPlayers > 1; document.getElementById('curAv').innerText = isMulti ? '👤' : user.avatar; document.getElementById('curName').innerText = isMulti ? `Player ${config.currentPlayer}` : user.name; document.getElementById('curName').style.color = config.playerColors[config.currentPlayer-1]; document.getElementById('guessInput').maxLength = config.digits; }
+        function setLang(l) { 
+            curLang = l; 
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                el.innerHTML = translations[l][key] || el.innerHTML;
+            }); 
+            document.getElementById('infoText').innerHTML = translations[l].infoBody; 
+        }
+
+        function toggleTheme() { 
+            config.isDark = !config.isDark; 
+            document.body.classList.toggle('light-theme'); 
+            document.getElementById('themeBtn').innerText = config.isDark ? "🌙" : "☀️"; 
+        }
+
+        function updateGameUI() { 
+            document.getElementById('curAv').innerText = (config.currentPlayer === 1) ? user.avatar : '👤'; 
+            document.getElementById('curName').innerText = (config.currentPlayer === 1) ? user.name.toUpperCase() : `OYUNCU ${config.currentPlayer}`; 
+            const input = document.getElementById('guessInput');
+            input.maxLength = config.digits; 
+            input.placeholder = ".".repeat(config.digits);
+            input.focus();
+        }
 
         window.onload = () => { 
             setLang('tr'); setMode('normal'); setPlayers(1); setDigits(4);
             const saved = localStorage.getItem('tahmat_user');
-            if(saved) { const p = JSON.parse(saved); db.ref('users/' + p.name).once('value', s => { if(s.val()?.pass === p.pass) { user = { ...user, ...s.val(), name: p.name }; loginSuccess(); }});}
+            if(saved) { 
+                const p = JSON.parse(saved); 
+                db.ref('users/' + p.name).once('value', s => { 
+                    if(s.exists() && s.val().pass === p.pass) { 
+                        user = { ...user, ...s.val(), name: p.name }; 
+                        loginSuccess(); 
+                    }
+                });
+            }
         };
     </script>
 </body>
